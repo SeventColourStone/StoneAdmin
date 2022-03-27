@@ -1,0 +1,13 @@
+
+        form.on('switch({%columnName%}_switch)', function(obj){
+            let theRequest = new Object();
+            theRequest.id = this.value
+            theRequest[this.name] = obj.elem.checked?0:1;
+            nyuwa.request(api.update,theRequest,function (result) {
+                if (result.success) {
+                    toast.success({message:result.message})
+                } else {
+                    toast.error({message:result.message})
+                }
+            })
+        });

@@ -1,0 +1,11 @@
+<label class="layui-form-label">{%columnComment%}</label>
+<div class="layui-input-block">
+
+    <select name="{%columnName%}" lay-verify="required">
+        <option value="">请选择{%columnComment%}</option>
+
+        <option value="010">北京</option>
+        <option value="021">上海</option>
+        <option value="0571">杭州</option>
+    </select>
+</div>

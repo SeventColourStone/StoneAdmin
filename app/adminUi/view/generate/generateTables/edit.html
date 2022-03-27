@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑页面</title>
+    <link rel="stylesheet" href="/static/component/pear/css/pear.css"/>
+</head>
+<body>
+<form class="layui-form" hidden="true" action="" lay-filter="save-form">
+    <div class="mainBox">
+        <div class="main-container layui-fluid">
+            
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">表名称</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="table_name" id="table_name" lay-verify="required" autocomplete="off" placeholder="请输入表名称" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">表注释</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="table_comment" id="table_comment" lay-verify="required" autocomplete="off" placeholder="请输入表注释" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">所属模块</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="module_name" id="module_name" lay-verify="required" autocomplete="off" placeholder="请输入所属模块" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">命名空间</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="namespace" id="namespace" lay-verify="required" autocomplete="off" placeholder="请输入命名空间" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">生成菜单名</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="menu_name" id="menu_name" lay-verify="required" autocomplete="off" placeholder="请输入生成菜单名" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">所属菜单</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="belong_menu_id" id="belong_menu_id" lay-verify="required" autocomplete="off" placeholder="请输入所属菜单" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">控制器包名</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="package_name" id="package_name" lay-verify="required" autocomplete="off" placeholder="请输入控制器包名" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">生成类型</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="type" id="type" lay-verify="required" autocomplete="off" placeholder="请输入生成类型" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">生成方式</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="generate_type" id="generate_type" lay-verify="required" autocomplete="off" placeholder="请输入生成方式" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">其他业务选项</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="options" id="options" lay-verify="required" autocomplete="off" placeholder="请输入其他业务选项" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">生成文件路径</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="files" id="files" lay-verify="required" autocomplete="off" placeholder="请输入生成文件路径" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">备注</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="remark" id="remark" lay-verify="required" autocomplete="off" placeholder="请输入备注" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit=""
+                    lay-filter="generate-tables-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+        </div>
+    </div>
+</form>
+<script src="/static/component/layui/layui.js"></script>
+<script src="/static/component/pear/pear.js"></script>
+<script>
+    layui.use(['form', 'jquery','nyuwa','xmSelect','loading','toast','tableSelect'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let nyuwa = layui.nyuwa;
+        let xmSelect = layui.xmSelect;
+        let loading = layui.loading;
+        let toast = layui.toast;
+        let tableSelect = layui.tableSelect;
+
+        let id = nyuwa.GetQueryValue(["id"]);
+
+        loading.Load(5, "");
+        let api = {
+            //select的数据接口
+            read: "/api/generate/generateTables/read",
+            update: "/api/generate/generateTables/update"
+        }
+
+        window.initData = function () {
+            
+            let funReadInfo = $.ajax(nyuwa.preRequestParams(api.read,{id:id}));
+            $.when(funReadInfo).then(function(readInfoData) {
+                let info = readInfoData.data;
+                form.val("save-form",{'id':info.id,'table_name':info.table_name,'table_comment':info.table_comment,'module_name':info.module_name,'namespace':info.namespace,'menu_name':info.menu_name,'belong_menu_id':info.belong_menu_id,'package_name':info.package_name,'type':info.type,'generate_type':info.generate_type,'options':info.options,'files':info.files,'remark':info.remark,});
+                
+                $(".layui-form").show()
+                loading.loadRemove();
+            })
+        }
+        initData()
+        form.on('submit(generate-tables-save)', function (data) {
+            Object.assign(data.field,{id:id})
+            nyuwa.request(api.update,data.field,function (result) {
+                if (result.success) {
+                    toast.success({message:result.message})
+                    parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭当前页
+                    parent.layui.table.reload("generate-tables-table");
+                } else {
+                    toast.error({message:result.message})
+                }
+            })
+            return false;
+        });
+    })
+</script>
+</body>
+</html>

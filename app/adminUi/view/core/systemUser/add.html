@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新增页面</title>
+    <link rel="stylesheet" href="/static/component/pear/css/pear.css"/>
+</head>
+<body>
+<form class="layui-form" hidden="true" action="" lay-filter="save-form">
+    <div class="mainBox">
+        <div class="main-container layui-fluid">
+            
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">用户名</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="username" id="username" lay-verify="required" autocomplete="off" placeholder="请输入用户名" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">密码</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="password" id="password" lay-verify="required" autocomplete="off" placeholder="请输入密码" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">用户类型</label>
+                    <div class="layui-input-block">
+                        <div id="xm-select-user_type"></div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">用户昵称</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="nickname" id="nickname" lay-verify="required" autocomplete="off" placeholder="请输入用户昵称" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">手机</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="phone" id="phone" lay-verify="required" autocomplete="off" placeholder="请输入手机" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">用户邮箱</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="email" id="email" lay-verify="required" autocomplete="off" placeholder="请输入用户邮箱" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">用户头像</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="avatar" id="avatar" lay-verify="required" autocomplete="off" placeholder="请输入用户头像" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">个人签名</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="signed" id="signed" lay-verify="required" autocomplete="off" placeholder="请输入个人签名" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">后台首页类型</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="dashboard" id="dashboard" lay-verify="required" autocomplete="off" placeholder="请输入后台首页类型" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">部门ID</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="dept_id" id="dept_id" lay-verify="required" autocomplete="off" placeholder="请输入部门ID" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">状态</label>
+                    <div class="layui-input-block">
+                        <div id="xm-select-status"></div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">最后登陆IP</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="login_ip" id="login_ip" lay-verify="required" autocomplete="off" placeholder="请输入最后登陆IP" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">最后登陆时间</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="login_time" id="login_time" lay-verify="required" autocomplete="off" placeholder="请输入最后登陆时间" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">后台设置数据</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="backend_setting" id="backend_setting" lay-verify="required" autocomplete="off" placeholder="请输入后台设置数据" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit=""
+                    lay-filter="system-user-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="pear-btn pear-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+<script src="/static/component/layui/layui.js"></script>
+<script src="/static/component/pear/pear.js"></script>
+<script>
+    layui.use(['form', 'jquery','nyuwa','xmSelect','loading','toast','tableSelect'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let common = layui.common;
+        let nyuwa = layui.nyuwa;
+        let xmSelect = layui.xmSelect;
+        let loading = layui.loading;
+        let toast = layui.toast;
+        let tableSelect = layui.tableSelect;
+
+        loading.Load(5, "");
+        let api = {
+            //select的数据接口
+            save: "/api/core/systemUser/save",
+        };
+
+        window.initData = function () {
+                        let userTypeXmSelect = xmSelect.render({
+                el: '#xm-select-user_type',
+                name: 'user_type',
+                radio: true,
+                toolbar: {show: true},
+                layVerify: 'required',
+                layVerType: 'tips',
+                data: []
+            })
+
+            let statusXmSelect = xmSelect.render({
+                el: '#xm-select-status',
+                name: 'status',
+                radio: true,
+                toolbar: {show: true},
+                layVerify: 'required',
+                layVerType: 'tips',
+                data: [{"name":"正常","value":"0","code":"status"},{"name":"停用","value":"1","code":"status"}]
+            })
+
+
+            $(".layui-form").show()
+            loading.loadRemove();
+        }
+        initData()
+
+        form.on('submit(system-user-save)', function (data) {
+             nyuwa.request(api.save,data.field,function (result) {
+                console.log(result)
+                if (result.success) {
+                    toast.success({message:result.message})
+                    parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭当前页
+                    parent.layui.table.reload("system-user-table");
+                } else {
+                    toast.error({message:result.message})
+                }
+            })
+            return false;
+        });
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">{%columnComment%}</label>
+                    <div class="layui-input-block">
+                        <div id="xm-select-{%columnName%}"></div>
+                    </div>
+                </div>
+            </div>
+

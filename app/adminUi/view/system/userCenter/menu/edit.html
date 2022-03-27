@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑页面</title>
+    <link rel="stylesheet" href="/static/component/pear/css/pear.css"/>
+</head>
+<body>
+<form class="layui-form" action="" lay-filter="save-form">
+    <div class="mainBox">
+        <div class="main-container layui-fluid">
+            
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">主键</label>
+                        <div class="layui-input-block">
+                        <input type="text" disabled name="id" lay-verify="required" autocomplete="off" placeholder="请输入主键" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">父ID</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="parent_id" lay-verify="required" autocomplete="off" placeholder="请输入父ID" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">组级集合</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="level" lay-verify="required" autocomplete="off" placeholder="请输入组级集合" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">菜单名称</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="name" lay-verify="required" autocomplete="off" placeholder="请输入菜单名称" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">菜单标识代码</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="code" lay-verify="required" autocomplete="off" placeholder="请输入菜单标识代码" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">菜单图标</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="icon" lay-verify="required" autocomplete="off" placeholder="请输入菜单图标" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">路由地址</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="route" lay-verify="required" autocomplete="off" placeholder="请输入路由地址" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">组件路径</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="component" lay-verify="required" autocomplete="off" placeholder="请输入组件路径" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">跳转地址</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="redirect" lay-verify="required" autocomplete="off" placeholder="请输入跳转地址" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">是否隐藏 (0是 1否)</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="is_hidden" lay-verify="required" autocomplete="off" placeholder="请输入是否隐藏 (0是 1否)" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">菜单类型, (M菜单 B按钮 L链接 I iframe)</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="type" lay-verify="required" autocomplete="off" placeholder="请输入菜单类型, (M菜单 B按钮 L链接 I iframe)" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">当 type 为 1 时，openType 生效，_iframe 正常打开 _blank 新建浏览器标签页</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="open_type" lay-verify="required" autocomplete="off" placeholder="请输入当 type 为 1 时，openType 生效，_iframe 正常打开 _blank 新建浏览器标签页" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">状态 (0正常 1停用)</label>
+                    <div class="layui-input-block">
+                        <div id="xm-select-status"></div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">排序</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="sort" lay-verify="required" autocomplete="off" placeholder="请输入排序" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">备注</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="remark" lay-verify="required" autocomplete="off" placeholder="请输入备注" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit=""
+                    lay-filter="system-menu-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="pear-btn pear-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+<script src="/static/component/layui/layui.js"></script>
+<script src="/static/component/pear/pear.js"></script>
+<script>
+    layui.use(['form', 'jquery','nyuwa','xmSelect','loading','toast'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let nyuwa = layui.nyuwa;
+        let xmSelect = layui.xmSelect;
+        let loading = layui.loading;
+        let toast = layui.toast;
+
+        let id = nyuwa.GetQueryValue(["id"]);
+        $("#id").val(id);
+
+        loading.Load(5, "");
+        let api = {
+            //select的数据接口
+            read: "/api/core/systemMenu/read",
+            update: "/api/core/systemMenu/update"
+        }
+
+        window.initData = function () {
+            let statusXmSelect = xmSelect.render({
+                el: '#xm-select-status',
+                name: 'status',
+                max: 2,
+                layVerify: 'required',
+                layVerType: 'tips',
+                data: [{"name":"正常","value":"0","code":"status"},{"name":"停用","value":"1","code":"status"}]
+            })
+
+            let funReadInfo = $.ajax(nyuwa.preRequestParams(api.read,{id:id}));
+            $.when(funReadInfo).then(function(readInfoData) {
+                console.log(readInfoData)
+                let info = readInfoData.data;
+                form.val("save-form",{'id':info.id,'parent_id':info.parent_id,'level':info.level,'name':info.name,'code':info.code,'icon':info.icon,'route':info.route,'component':info.component,'redirect':info.redirect,'is_hidden':info.is_hidden,'type':info.type,'open_type':info.open_type,'sort':info.sort,'remark':info.remark,});
+                $(".layui-form").show()
+                loading.loadRemove();
+            })
+        }
+        initData()
+        form.on('submit(system-menu-save)', function (data) {
+            nyuwa.request(api.update,data.field,function (result) {
+                console.log(result)
+                if (result.success) {
+                    toast.success({message:result.message})
+                    parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭当前页
+                    parent.layui.table.reload("system-menu-table");
+                } else {
+                    toast.error({message:result.message})
+                }
+            })
+            return false;
+        });
+    })
+</script>
+</body>
+</html>

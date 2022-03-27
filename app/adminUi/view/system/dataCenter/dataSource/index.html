@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>数据源管理</title>
+    <link rel="stylesheet" href="/static/component/pear/css/pear.css"/>
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label">表名</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="table" placeholder="" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item layui-inline">
+                    <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="data-source-query">
+                        <i class="layui-icon layui-icon-search"></i>
+                        查询
+                    </button>
+                    <button type="reset" class="pear-btn pear-btn-md">
+                        <i class="layui-icon layui-icon-refresh"></i>
+                        重置
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table id="data-source-table" lay-filter="data-source-table"></table>
+    </div>
+</div>
+
+<script type="text/html" id="data-source-toolbar">
+    <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+        <i class="layui-icon layui-icon-add-1"></i>
+        新增
+    </button>
+<!--    <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove">-->
+<!--        <i class="layui-icon layui-icon-delete"></i>-->
+<!--        删除-->
+<!--    </button>-->
+    <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="tableOptimize">
+        <i class="layui-icon layui-icon-delete"></i>
+        表优化
+    </button>
+    <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="tableFragment">
+        <i class="layui-icon layui-icon-delete"></i>
+        表碎片清理
+    </button>
+</script>
+
+<script type="text/html" id="data-source-bar">
+    <button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>
+    </button>
+    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i class="layui-icon layui-icon-delete"></i>
+    </button>
+</script>
+
+<script type="text/html" id="data-source-enable">
+    <input type="checkbox" name="enable" value="{{d.id}}" lay-skin="switch" lay-text="启用|禁用" lay-filter="data-source-enable" {{
+           d.enable== true ? 'checked' : '' }} />
+</script>
+
+<script type="text/html" id="user-sex">
+    {{#if (d.sex == 1) { }}
+    <span>男</span>
+    {{# }else if(d.sex == 2){ }}
+    <span>女</span>
+    {{# } }}
+</script>
+
+<script type="text/html" id="user-login">
+    {{#if (d.login == 0) { }}
+    <span>在线</span>
+    {{# }else if(d.sex == 1){ }}
+    <span>离线</span>
+    {{# } }}
+</script>
+
+<script type="text/html" id="user-createTime">
+    {{layui.util.toDateString(d.createTime, 'yyyy-MM-dd')}}
+</script>
+
+<script src="/static/component/layui/layui.js"></script>
+<script src="/static/component/pear/pear.js"></script>
+<script>
+
+    layui.use(['table', 'notice','toast', 'form', 'jquery', 'common', 'nyuwa'], function () {
+
+        window.initTableParams = function (){
+            let tableParams = {
+                elem: '#data-source-table',
+                cellMinWidth: 150, //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                page: true,
+                cols: cols,
+                skin: 'line',
+                toolbar: '#data-source-toolbar',
+                defaultToolbar: [{
+                    title: '刷新',
+                    layEvent: 'refresh',
+                    icon: 'layui-icon-refresh',
+                },'filter', 'print', 'exports']
+            };
+            Object.assign(tableParams, nyuwa.tableRequest(api.index));
+            return tableParams;
+        }
+
+        let api = {
+            index: "/api/system/dataSource/index",
+            detailed: "/api/system/dataSource/detailed",
+            optimize: "/api/system/dataSource/optimize",
+            fragment: "/api/system/dataSource/fragment",
+        };
+        let ui = {
+            save : "/ui/dataCenter/dataSourceSave"
+        }
+        let table = layui.table;
+        let form = layui.form;
+        let $ = layui.jquery;
+        let toast = layui.toast;
+        let common = layui.common;
+        let nyuwa = layui.nyuwa;
+
+        let cols = [
+            [
+                {type:'checkbox'},
+                {title: '表名称',field: 'name',align: 'center'},
+                {title: '表引擎',field: 'engine',align: 'center'},
+                {title: '总行数',field: 'rows',align: 'center'},
+                {title: '碎片大小',field: 'data_free',align: 'center'},
+                {title: '数据大小',field: 'data_length',align: 'center'},
+                {title: '索引大小',field: 'index_length',align: 'center'},
+                {title: '字符集',field: 'collation',align: 'center'},
+                {title: '创建时间',field: 'create_time',align: 'center'},
+                {title: '更新时间',field: 'update_time',align: 'center'},
+                {title: '表注释',field: 'comment',align: 'center'},
+                {title: '操作',toolbar: '#data-source-bar',align: 'center',width: 130}
+            ]
+        ]
+
+        let tableParams = initTableParams();
+        table.render(tableParams);
+
+        table.on('tool(data-source-table)', function (obj) {
+            if (obj.event === 'remove') {
+                window.remove(obj);
+            } else if (obj.event === 'edit') {
+                window.edit(obj);
+            }
+        });
+
+        table.on('toolbar(data-source-table)', function (obj) {
+            if (obj.event === 'add') {
+                window.add();
+            } else if (obj.event === 'refresh') {
+                window.refresh();
+            } else if (obj.event === 'tableOptimize') {
+                window.tableOptimize();
+            } else if (obj.event === 'tableFragment') {
+                window.tableFragment();
+            } else if (obj.event === 'batchRemove') {
+                window.batchRemove(obj);
+            }
+        });
+
+        form.on('submit(data-source-query)', function (data) {
+            table.reload('data-source-table', {
+                where: data.field
+            })
+            return false;
+        });
+
+        form.on('switch(data-source-enable)', function (obj) {
+            layer.tips(this.value + ' ' + this.name + '：' + obj.elem.checked, obj.othis);
+        });
+
+        window.add = function () {
+            layer.open({
+                type: 2,
+                title: '新增',
+                maxmin: true,
+                shade: 0.1,
+                area: [common.isModile() ? '100%' : '90%', common.isModile() ? '100%' : '80%'],
+                content: ui.save
+            });
+        }
+
+        window.edit = function (obj) {
+            layer.open({
+                type: 2,
+                title: '修改',
+                shade: 0.1,
+                area: [common.isModile() ? '100%' : '90%', common.isModile() ? '100%' : '80%'],
+                content: ui.save
+            });
+        }
+
+        window.remove = function (obj) {
+            layer.confirm('确定要删除该条目', {
+                icon: 3,
+                title: '提示'
+            }, function (index) {
+                layer.close(index);
+                let loading = layer.load();
+                $.ajax({
+                    url: ui.save + "remove/" + obj.data['userId'],
+                    dataType: 'json',
+                    type: 'delete',
+                    success: function (result) {
+                        layer.close(loading);
+                        if (result.success) {
+                            layer.msg(result.msg, {
+                                icon: 1,
+                                time: 1000
+                            }, function () {
+                                obj.del();
+                            });
+                        } else {
+                            layer.msg(result.msg, {
+                                icon: 2,
+                                time: 1000
+                            });
+                        }
+                    }
+                })
+            });
+        }
+
+        window.batchRemove = function (obj) {
+
+            var checkIds = common.checkField(obj, 'userId');
+
+            if (checkIds === "") {
+                layer.msg("未选中数据", {
+                    icon: 3,
+                    time: 1000
+                });
+                return false;
+            }
+
+            layer.confirm('确定要删除这些用户', {
+                icon: 3,
+                title: '提示'
+            }, function (index) {
+                layer.close(index);
+                let loading = layer.load();
+                $.ajax({
+                    url: api.detailed + "batchRemove/" + ids,
+                    dataType: 'json',
+                    type: 'delete',
+                    success: function (result) {
+                        layer.close(loading);
+                        if (result.success) {
+                            layer.msg(result.msg, {
+                                icon: 1,
+                                time: 1000
+                            }, function () {
+                                table.reload('data-source-table');
+                            });
+                        } else {
+                            layer.msg(result.msg, {
+                                icon: 2,
+                                time: 1000
+                            });
+                        }
+                    }
+                })
+            });
+        }
+
+        window.refresh = function (param) {
+            table.reload('data-source-table');
+        }
+
+        window.tableOptimize = function (params){
+            nyuwa.request(api.optimize,{},function (res) {
+                if (res.code){
+                    toast.success({message:"优化成功"})
+                }
+            })
+        }
+        window.tableFragment = function (params){
+            nyuwa.request(api.fragment,{},function (res) {
+                if (res.code){
+
+                    toast.success({message:"表碎片清理成功"})
+                }
+            })
+        }
+
+    })
+</script>
+</body>
+</html>

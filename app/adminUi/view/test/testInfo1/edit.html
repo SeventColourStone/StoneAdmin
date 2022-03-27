@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑页面</title>
+    <link rel="stylesheet" href="/static/component/pear/css/pear.css"/>
+</head>
+<body>
+<form class="layui-form" hidden="true" action="" lay-filter="save-form">
+    <div class="mainBox">
+        <div class="main-container layui-fluid">
+            
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label"></label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="ceshi_name" id="ceshi_name" lay-verify="required" autocomplete="off" placeholder="请输入" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit=""
+                    lay-filter="test-info1-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+        </div>
+    </div>
+</form>
+<script src="/static/component/layui/layui.js"></script>
+<script src="/static/component/pear/pear.js"></script>
+<script>
+    layui.use(['form', 'jquery','nyuwa','xmSelect','loading','toast','tableSelect'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let nyuwa = layui.nyuwa;
+        let xmSelect = layui.xmSelect;
+        let loading = layui.loading;
+        let toast = layui.toast;
+        let tableSelect = layui.tableSelect;
+
+        let id = nyuwa.GetQueryValue(["id"]);
+
+        loading.Load(5, "");
+        let api = {
+            //select的数据接口
+            read: "/api/test/testInfo1/read",
+            update: "/api/test/testInfo1/update"
+        }
+
+        window.initData = function () {
+            
+            let funReadInfo = $.ajax(nyuwa.preRequestParams(api.read,{id:id}));
+            $.when(funReadInfo).then(function(readInfoData) {
+                let info = readInfoData.data;
+                form.val("save-form",{'id':info.id,'ceshi_name':info.ceshi_name,});
+                
+                $(".layui-form").show()
+                loading.loadRemove();
+            })
+        }
+        initData()
+        form.on('submit(test-info1-save)', function (data) {
+            Object.assign(data.field,{id:id})
+            nyuwa.request(api.update,data.field,function (result) {
+                if (result.success) {
+                    toast.success({message:result.message})
+                    parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭当前页
+                    parent.layui.table.reload("test-info1-table");
+                } else {
+                    toast.error({message:result.message})
+                }
+            })
+            return false;
+        });
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+            let tableselectParams ={
+                page: true,
+                skin: 'line',
+                cols:[[
+                    { type: 'radio' },
+                    {title: '字典类型名称',field: 'name',width:100,},
+                    {title: '备注',field: 'remark',width:100,}
+                ]]
+            }
+            Object.assign(tableselectParams, nyuwa.tableRequest(api.dictTypeIndex));
+            tableSelect.render({
+                elem: '#dict_type_id',
+                checkedKey: 'id',
+                searchKey: 'keyword',
+                searchPlaceholder: '关键词搜索',
+                table: tableselectParams,
+                done: function (elem, data) {
+                    let NEWJSON = []
+                    layui.each(data.data, function (index, item) {
+                        NEWJSON.push(item.id)
+                    })
+                    elem.val(NEWJSON.join(","))
+                }
+            })

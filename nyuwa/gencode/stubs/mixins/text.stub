@@ -1,0 +1,9 @@
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">{%columnComment%}</label>
+                        <div class="layui-input-block">
+                        <input type="text" {%disabled%} name="{%columnName%}" id="{%columnName%}" lay-verify="required" autocomplete="off" placeholder="请输入{%columnComment%}" class="layui-input">
+                    </div>
+                </div>
+            </div>

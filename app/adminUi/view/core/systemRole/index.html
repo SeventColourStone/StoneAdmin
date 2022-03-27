@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>管理</title>
+    <link rel="stylesheet" href="/static/component/pear/css/pear.css"/>
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label">id</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="id" placeholder="" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item layui-inline">
+                    <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="system-role-query">
+                        <i class="layui-icon layui-icon-search"></i>
+                        查询
+                    </button>
+                    <button type="reset" class="pear-btn pear-btn-md">
+                        <i class="layui-icon layui-icon-refresh"></i>
+                        重置
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table id="system-role-table" lay-filter="system-role-table"></table>
+    </div>
+</div>
+
+<script type="text/html" id="system-role-toolbar">
+    <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+        <i class="layui-icon layui-icon-add-1"></i>
+        新增
+    </button>
+    <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove">
+        <i class="layui-icon layui-icon-delete"></i>
+        删除
+    </button>
+</script>
+
+<script type="text/html" id="system-role-bar">
+    <button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>
+    </button>
+    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i class="layui-icon layui-icon-delete"></i>
+    </button>
+</script>
+
+<!-- 表格一些定制化的组件转换 -->
+
+<script type="text/html" id="status_tpl">
+  <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="是|否" lay-filter="status_switch" {{ d.status == 0 ? 'checked' : '' }}>
+</script>
+
+<script src="/static/component/layui/layui.js"></script>
+<script src="/static/component/pear/pear.js"></script>
+<script>
+
+    layui.use(['table', 'form', 'jquery', 'common', 'nyuwa','toast','tableSelect'], function () {
+
+        window.initTableParams = function (){
+            let tableParams = {
+                elem: '#system-role-table',
+                cellMinWidth: 150,
+                page: true,
+                cols: cols,
+                skin: 'line',
+                toolbar: '#system-role-toolbar',
+                defaultToolbar: [{
+                    title: '刷新',
+                    layEvent: 'refresh',
+                    icon: 'layui-icon-refresh',
+                },{
+                    title: '回收站',
+                    layEvent: 'recycle',
+                    icon: 'layui-icon-delete',
+                }, 'filter', 'print', 'exports']
+            };
+            if(!isRecycle){
+                Object.assign(tableParams, nyuwa.tableRequest(api.index,theRequest));
+            }else{
+                Object.assign(tableParams, nyuwa.tableRequest(api.recycle,theRequest));
+            }
+            return tableParams;
+        }
+
+        let api = {
+            index: "/api/core/systemRole/index",
+            recycle: "/api/core/systemRole/recycle",
+            save: "/api/core/systemRole/save",
+            read: "/api/core/systemRole/read",
+            delete: "/api/core/systemRole/delete",
+            update: "/api/core/systemRole/update",
+            realDelete: "/api/core/systemRole/realDelete",
+            recovery: "/api/core/systemRole/recovery",
+        };
+        let ui = {
+            add : "/ui/core/systemRole/add",
+            edit : "/ui/core/systemRole/edit",
+        }
+        let table = layui.table;
+        let form = layui.form;
+        let $ = layui.jquery;
+        let common = layui.common;
+        let nyuwa = layui.nyuwa;
+        let toast = layui.toast;
+
+        let theRequest = nyuwa.GetAllQuery();
+        //是否回收站列表
+        let isRecycle = false;
+
+        let cols = [
+            [
+                {type:'checkbox', fixed: 'left'},{title: '角色名称',field: 'name',align: 'center'},{title: '角色代码',field: 'code',align: 'center'},{title: '数据范围',field: 'data_scope',align: 'center'},{title: '状态',field: 'status', templet: '#status_tpl', unresize: true},{title: '排序',field: 'sort',align: 'center'},{title: '创建时间',field: 'created_at',align: 'center'},{title: '操作',toolbar: '#system-role-bar', fixed: 'right',align: 'center',width: 130}
+            ]
+        ]
+
+
+        let tableParams = initTableParams();
+        table.render(tableParams);
+
+        table.on('tool(system-role-table)', function (obj) {
+            if (obj.event === 'remove') {
+                window.remove(obj);
+            } else if (obj.event === 'edit') {
+                window.edit(obj);
+            }
+        });
+
+        table.on('toolbar(system-role-table)', function (obj) {
+            if (obj.event === 'add') {
+                window.add();
+            } else if (obj.event === 'refresh') {
+                window.refresh();
+            } else if (obj.event === 'recycle') {
+                window.recycle();
+            } else if (obj.event === 'batchRemove') {
+                window.batchRemove(obj);
+            }
+        });
+
+        form.on('submit(system-role-query)', function (data) {
+            nyuwa.compactObj(data.field)
+            table.reload('system-role-table', {
+                where: data.field
+            })
+            return false;
+        });
+
+        form.on('switch(system-role-enable)', function (obj) {
+            layer.tips(this.value + ' ' + this.name + '：' + obj.elem.checked, obj.othis);
+        });
+        //这里是表格组件操作生成器
+        
+        form.on('switch(status_switch)', function(obj){
+            let theRequest = new Object();
+            theRequest.id = this.value
+            theRequest[this.name] = obj.elem.checked?0:1;
+            nyuwa.request(api.update,theRequest,function (result) {
+                if (result.success) {
+                    toast.success({message:result.message})
+                } else {
+                    toast.error({message:result.message})
+                }
+            })
+        });
+        //这里是表格组件操作生成器
+
+        window.add = function () {
+            layer.open({
+                type: 2,
+                title: '新增',
+                maxmin: true,
+                shade: 0.1,
+                area: [common.isModile() ? '100%' : '80%', common.isModile() ? '100%' : '80%'],
+                content: ui.add,
+                success: function(layero, index){
+
+                }
+            });
+        }
+
+        window.edit = function (obj) {
+            layer.open({
+                type: 2,
+                title: '编辑',
+                maxmin: true,
+                shade: 0.1,
+                area: [common.isModile() ? '100%' : '80%', common.isModile() ? '100%' : '80%'],
+                content: ui.edit+"?id="+obj.data.id,
+                success: function(layero, index){
+                    //传递参数
+                    let body = layer.getChildFrame('body', index);
+                    // let head = layer.getChildFrame('head', index);
+                    // head.find('title').text("编辑用户");
+
+                }
+            });
+        }
+
+        window.remove = function (obj) {
+            layer.confirm('确定要删除该条目', {
+                icon: 3,
+                title: '提示'
+            }, function (index) {
+                layer.close(index);
+                let loading = layer.load();
+                nyuwa.request(api.delete, {id:obj.data.id},function (result) {
+                    layer.close(loading);
+                    if (result.success) {
+                        toast.success({message:result.message})
+                        obj.del();
+                    } else {
+                        toast.error({message:result.message})
+                    }
+                });
+            });
+        }
+
+        window.batchRemove = function (obj) {
+
+            let checkIds = common.checkField(obj, 'id');
+
+            if (checkIds === "") {
+                toast.warning({message:"未选中数据"})
+                return false;
+            }
+
+            layer.confirm('确定要删除这些用户', {
+                icon: 3,
+                title: '提示'
+            }, function (index) {
+                layer.close(index);
+                let loading = layer.load();
+                nyuwa.request(api.delete, {id:checkIds},function (result) {
+                    layer.close(loading);
+                    if (result.success) {
+                        toast.success({message:result.message})
+                        table.reload('test-info-table');
+                    } else {
+                        toast.error({message:result.message})
+                    }
+                });
+            });
+        }
+
+        window.refresh = function (param) {
+            table.reload('system-role-table');
+        }
+
+        window.recycle = function (param){
+            isRecycle = !isRecycle
+            // table.reload('system-role-table');
+            let tableParams = window.initTableParams();
+            table.render(tableParams);
+        }
+
+    })
+</script>
+</body>
+</html>

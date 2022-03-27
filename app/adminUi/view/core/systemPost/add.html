@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新增页面</title>
+    <link rel="stylesheet" href="/static/component/pear/css/pear.css"/>
+</head>
+<body>
+<form class="layui-form" hidden="true" action="" lay-filter="save-form">
+    <div class="mainBox">
+        <div class="main-container layui-fluid">
+            
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">岗位名称</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="name" id="name" lay-verify="required" autocomplete="off" placeholder="请输入岗位名称" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">岗位代码</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="code" id="code" lay-verify="required" autocomplete="off" placeholder="请输入岗位代码" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">排序</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="sort" id="sort" lay-verify="required" autocomplete="off" placeholder="请输入排序" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">状态</label>
+                    <div class="layui-input-block">
+                        <div id="xm-select-status"></div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit=""
+                    lay-filter="system-post-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="pear-btn pear-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+<script src="/static/component/layui/layui.js"></script>
+<script src="/static/component/pear/pear.js"></script>
+<script>
+    layui.use(['form', 'jquery','nyuwa','xmSelect','loading','toast','tableSelect'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let common = layui.common;
+        let nyuwa = layui.nyuwa;
+        let xmSelect = layui.xmSelect;
+        let loading = layui.loading;
+        let toast = layui.toast;
+        let tableSelect = layui.tableSelect;
+
+        loading.Load(5, "");
+        let api = {
+            //select的数据接口
+            save: "/api/core/systemPost/save",
+        };
+
+        window.initData = function () {
+                        let statusXmSelect = xmSelect.render({
+                el: '#xm-select-status',
+                name: 'status',
+                radio: true,
+                toolbar: {show: true},
+                layVerify: 'required',
+                layVerType: 'tips',
+                data: [{"name":"正常","value":"0","code":"status"},{"name":"停用","value":"1","code":"status"}]
+            })
+
+
+            $(".layui-form").show()
+            loading.loadRemove();
+        }
+        initData()
+
+        form.on('submit(system-post-save)', function (data) {
+             nyuwa.request(api.save,data.field,function (result) {
+                console.log(result)
+                if (result.success) {
+                    toast.success({message:result.message})
+                    parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭当前页
+                    parent.layui.table.reload("system-post-table");
+                } else {
+                    toast.error({message:result.message})
+                }
+            })
+            return false;
+        });
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<?php
+
+
+namespace nyuwa\aspect;
+
+
+use nyuwa\exception\TokenException;
+use nyuwa\helper\LoginUser;
+use yzh52521\aop\AbstractAspect;
+use yzh52521\aop\ProceedingJoinPoint;
+
+class AuthAspect extends AbstractAspect
+{
+    public $annotations = [
+        Auth::class
+    ];
+
+    /**
+     * @var LoginUser
+     */
+    protected $loginUser;
+
+    public function __construct(LoginUser $loginUser)
+    {
+        $this->loginUser = $loginUser;
+    }
+
+    /**
+     * @param ProceedingJoinPoint $proceedingJoinPoint
+     * @return mixed
+     * @throws Exception
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function process(ProceedingJoinPoint $proceedingJoinPoint)
+    {
+        if ($this->loginUser->check()) {
+            return $proceedingJoinPoint->process();
+        }
+        throw new TokenException(t('jwt.validate_fail'));
+    }
+}

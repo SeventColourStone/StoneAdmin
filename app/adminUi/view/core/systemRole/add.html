@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新增页面</title>
+    <link rel="stylesheet" href="/static/component/pear/css/pear.css"/>
+</head>
+<body>
+<form class="layui-form" hidden="true" action="" lay-filter="save-form">
+    <div class="mainBox">
+        <div class="main-container layui-fluid">
+            
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">角色名称</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="name" id="name" lay-verify="required" autocomplete="off" placeholder="请输入角色名称" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">角色代码</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="code" id="code" lay-verify="required" autocomplete="off" placeholder="请输入角色代码" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">数据范围</label>
+                    <div class="layui-input-block">
+                        <div id="xm-select-data_scope"></div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">状态</label>
+                    <div class="layui-input-block">
+                        <div id="xm-select-status"></div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="layui-col-xs12 layui-col-sm6">
+                <div class="layui-form-item ">
+                    <label class="layui-form-label">排序</label>
+                        <div class="layui-input-block">
+                        <input type="text"  name="sort" id="sort" lay-verify="required" autocomplete="off" placeholder="请输入排序" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit=""
+                    lay-filter="system-role-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="pear-btn pear-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+<script src="/static/component/layui/layui.js"></script>
+<script src="/static/component/pear/pear.js"></script>
+<script>
+    layui.use(['form', 'jquery','nyuwa','xmSelect','loading','toast','tableSelect'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let common = layui.common;
+        let nyuwa = layui.nyuwa;
+        let xmSelect = layui.xmSelect;
+        let loading = layui.loading;
+        let toast = layui.toast;
+        let tableSelect = layui.tableSelect;
+
+        loading.Load(5, "");
+        let api = {
+            //select的数据接口
+            save: "/api/core/systemRole/save",
+        };
+
+        window.initData = function () {
+                        let dataScopeXmSelect = xmSelect.render({
+                el: '#xm-select-data_scope',
+                name: 'data_scope',
+                radio: true,
+                toolbar: {show: true},
+                layVerify: 'required',
+                layVerType: 'tips',
+                data: [{"name":"全部数据权限","value":"0","code":"data_scope"},{"name":"自定义数据权限","value":"1","code":"data_scope"},{"name":"本部门数据权限","value":"2","code":"data_scope"},{"name":"本部门及以下级数据权限","value":"3","code":"data_scope"},{"name":"本人数据权限","value":"4","code":"data_scope"}]
+            })
+
+            let statusXmSelect = xmSelect.render({
+                el: '#xm-select-status',
+                name: 'status',
+                radio: true,
+                toolbar: {show: true},
+                layVerify: 'required',
+                layVerType: 'tips',
+                data: [{"name":"正常","value":"0","code":"status"},{"name":"停用","value":"1","code":"status"}]
+            })
+
+
+            $(".layui-form").show()
+            loading.loadRemove();
+        }
+        initData()
+
+        form.on('submit(system-role-save)', function (data) {
+             nyuwa.request(api.save,data.field,function (result) {
+                console.log(result)
+                if (result.success) {
+                    toast.success({message:result.message})
+                    parent.layer.close(parent.layer.getFrameIndex(window.name)); //关闭当前页
+                    parent.layui.table.reload("system-role-table");
+                } else {
+                    toast.error({message:result.message})
+                }
+            })
+            return false;
+        });
+    })
+</script>
+</body>
+</html>

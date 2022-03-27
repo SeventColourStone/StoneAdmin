@@ -1,0 +1,8 @@
+            let {%xmSelectName%} = xmSelect.render({
+                el: '#xm-select-{%columnName%}',
+                name: '{%columnName%}',
+                toolbar: {show: true},
+                layVerify: 'required',
+                layVerType: 'tips',
+                data: {%columnDictData%}
+            })

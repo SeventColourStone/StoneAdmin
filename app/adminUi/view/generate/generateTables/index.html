@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>管理</title>
+    <link rel="stylesheet" href="/static/component/pear/css/pear.css"/>
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label">id</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="id" placeholder="" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item layui-inline">
+                    <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="generate-tables-query">
+                        <i class="layui-icon layui-icon-search"></i>
+                        查询
+                    </button>
+                    <button type="reset" class="pear-btn pear-btn-md">
+                        <i class="layui-icon layui-icon-refresh"></i>
+                        重置
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table id="generate-tables-table" lay-filter="generate-tables-table"></table>
+    </div>
+</div>
+
+<script type="text/html" id="generate-tables-toolbar">
+    <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+        <i class="layui-icon layui-icon-add-1"></i>
+        新增
+    </button>
+    <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove">
+        <i class="layui-icon layui-icon-delete"></i>
+        删除
+    </button>
+</script>
+
+<script type="text/html" id="generate-tables-bar">
+    <button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>
+    </button>
+    <!--    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i class="layui-icon layui-icon-delete"></i>-->
+    <!--    </button>-->
+    <button class="pear-btn pear-btn-success pear-btn-sm" lay-event="detail"><i class="layui-icon layui-icon-eye"></i>
+    </button>
+</script>
+
+<!-- 表格一些定制化的组件转换 -->
+
+
+<script src="/static/component/layui/layui.js"></script>
+<script src="/static/component/pear/pear.js"></script>
+<script>
+
+    layui.use(['table', 'form', 'jquery', 'common', 'nyuwa','toast','tableSelect'], function () {
+
+        window.initTableParams = function (){
+            let tableParams = {
+                elem: '#generate-tables-table',
+                cellMinWidth: 150,
+                page: true,
+                cols: cols,
+                skin: 'line',
+                toolbar: '#generate-tables-toolbar',
+                defaultToolbar: [{
+                    title: '刷新',
+                    layEvent: 'refresh',
+                    icon: 'layui-icon-refresh',
+                },{
+                    title: '回收站',
+                    layEvent: 'recycle',
+                    icon: 'layui-icon-delete',
+                }, 'filter', 'print', 'exports']
+            };
+            if(!isRecycle){
+                Object.assign(tableParams, nyuwa.tableRequest(api.index,theRequest));
+            }else{
+                Object.assign(tableParams, nyuwa.tableRequest(api.recycle,theRequest));
+            }
+            return tableParams;
+        }
+
+        let api = {
+            index: "/api/generate/generateTables/index",
+            recycle: "/api/generate/generateTables/recycle",
+            save: "/api/generate/generateTables/save",
+            read: "/api/generate/generateTables/read",
+            delete: "/api/generate/generateTables/delete",
+            update: "/api/generate/generateTables/update",
+            realDelete: "/api/generate/generateTables/realDelete",
+            recovery: "/api/generate/generateTables/recovery",
+        };
+        let ui = {
+            add : "/ui/generate/generateTables/add",
+            edit : "/ui/generate/generateTables/edit",
+            generateColumnsIndex : "/ui/generate/generateColumns/index",
+        }
+        let table = layui.table;
+        let form = layui.form;
+        let $ = layui.jquery;
+        let common = layui.common;
+        let nyuwa = layui.nyuwa;
+
+        let theRequest = nyuwa.GetAllQuery();
+        //是否回收站列表
+        let isRecycle = false;
+
+        let cols = [
+            [
+                {type:'checkbox', fixed: 'left'},{title: '表名称',field: 'table_name',align: 'center'},{title: '表注释',field: 'table_comment',align: 'center'},{title: '所属模块',field: 'module_name',align: 'center'},{title: '命名空间',field: 'namespace',align: 'center'},{title: '生成菜单名',field: 'menu_name',align: 'center'},{title: '所属菜单',field: 'belong_menu_id',align: 'center'},{title: '控制器包名',field: 'package_name',align: 'center'},{title: '生成类型',field: 'type',align: 'center'},{title: '生成方式',field: 'generate_type',align: 'center'},{title: '其他业务选项',field: 'options',align: 'center'},{title: '生成文件路径',field: 'files',align: 'center'},{title: '创建时间',field: 'created_at',align: 'center'},{title: '备注',field: 'remark',align: 'center'},{title: '操作',toolbar: '#generate-tables-bar', fixed: 'right',align: 'center',width: 130}
+            ]
+        ]
+
+
+        let tableParams = initTableParams();
+        table.render(tableParams);
+
+        table.on('tool(generate-tables-table)', function (obj) {
+            if (obj.event === 'remove') {
+                window.remove(obj);
+            } else if (obj.event === 'edit') {
+                window.edit(obj);
+            } else if (obj.event === 'detail') {
+                window.detail(obj);
+            }
+        });
+
+        table.on('toolbar(generate-tables-table)', function (obj) {
+            if (obj.event === 'add') {
+                window.add();
+            } else if (obj.event === 'refresh') {
+                window.refresh();
+            } else if (obj.event === 'recycle') {
+                window.recycle();
+            } else if (obj.event === 'batchRemove') {
+                window.batchRemove(obj);
+            }
+        });
+
+        form.on('submit(generate-tables-query)', function (data) {
+            nyuwa.compactObj(data.field)
+            table.reload('generate-tables-table', {
+                where: data.field
+            })
+            return false;
+        });
+
+        form.on('switch(generate-tables-enable)', function (obj) {
+            layer.tips(this.value + ' ' + this.name + '：' + obj.elem.checked, obj.othis);
+        });
+
+        window.add = function () {
+            layer.open({
+                type: 2,
+                title: '新增',
+                maxmin: true,
+                shade: 0.1,
+                area: [common.isModile() ? '100%' : '80%', common.isModile() ? '100%' : '80%'],
+                content: ui.add,
+                success: function(layero, index){
+
+                }
+            });
+        }
+
+        window.edit = function (obj) {
+            layer.open({
+                type: 2,
+                title: '编辑',
+                maxmin: true,
+                shade: 0.1,
+                area: [common.isModile() ? '100%' : '80%', common.isModile() ? '100%' : '80%'],
+                content: ui.edit+"?id="+obj.data.id,
+                success: function(layero, index){
+                    //传递参数
+                    let body = layer.getChildFrame('body', index);
+                    // let head = layer.getChildFrame('head', index);
+                    // head.find('title').text("编辑用户");
+
+                }
+            });
+        }
+
+        window.detail = function (obj){
+            layer.open({
+                type: 2,
+                title: '详情',
+                maxmin: true,
+                shade: 0.1,
+                area: [common.isModile() ? '100%' : '80%', common.isModile() ? '100%' : '80%'],
+                content: ui.generateColumnsIndex+"?table_id="+obj.data.id,
+                success: function(layero, index){
+                    //传递参数
+                    let body = layer.getChildFrame('body', index);
+                    // let head = layer.getChildFrame('head', index);
+                    // head.find('title').text("编辑用户");
+                }
+            });
+        }
+
+        window.remove = function (obj) {
+            layer.confirm('确定要删除该条目', {
+                icon: 3,
+                title: '提示'
+            }, function (index) {
+                layer.close(index);
+                let loading = layer.load();
+                nyuwa.request(api.delete, {id:obj.data.id},function (result) {
+                    layer.close(loading);
+                    if (result.success) {
+                        toast.success({message:result.message})
+                        obj.del();
+                    } else {
+                        toast.error({message:result.message})
+                    }
+                });
+            });
+        }
+
+        window.batchRemove = function (obj) {
+
+            let checkIds = common.checkField(obj, 'id');
+
+            if (checkIds === "") {
+                toast.warning({message:"未选中数据"})
+                return false;
+            }
+
+            layer.confirm('确定要删除这些用户', {
+                icon: 3,
+                title: '提示'
+            }, function (index) {
+                layer.close(index);
+                let loading = layer.load();
+                nyuwa.request(api.delete, {id:checkIds},function (result) {
+                    layer.close(loading);
+                    if (result.success) {
+                        toast.success({message:result.message})
+                        table.reload('test-info-table');
+                    } else {
+                        toast.error({message:result.message})
+                    }
+                });
+            });
+        }
+
+        window.refresh = function (param) {
+            table.reload('generate-tables-table');
+        }
+
+        window.recycle = function (param){
+            isRecycle = !isRecycle
+            // table.reload('generate-tables-table');
+            let tableParams = window.initTableParams();
+            table.render(tableParams);
+        }
+
+    })
+</script>
+</body>
+</html>
