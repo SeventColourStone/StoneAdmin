@@ -236,21 +236,19 @@ class Str
      * 获取IP的区域地址
      * @param string $ip
      * @return string
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public static function ipToRegion(string $ip): string
     {
-        $ip2Region = make(\Ip2Region::class);
+        $ip2Region = nyuwa_app(\Ip2Region::class);
         if (empty($ip2Region->btreeSearch($ip)['region'])) {
-            return t('jwt.unknown');
+            return nyuwa_trans('jwt.unknown');
         }
         $region = $ip2Region->btreeSearch($ip)['region'];
         list($country, $number, $province, $city, $network) = explode('|', $region);
         if ($country == '中国') {
             return $province . '-' . $city . ':' . $network;
         } else if ($country == '0') {
-            return t('jwt.unknown');
+            return nyuwa_trans('jwt.unknown');
         } else {
             return $country;
         }

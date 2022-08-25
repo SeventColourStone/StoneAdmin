@@ -5,9 +5,12 @@
  * 对一些框架级的方法做一下包装，减低框架级别依赖
  */
 
+use Godruoyi\Snowflake\Snowflake;
 use nyuwa\helper\LoginUser;
+use nyuwa\vo\QueueMessageVo;
 use support\Container;
 use nyuwa\Event;
+use Symfony\Component\Finder\Finder;
 use Webman\App;
 use Webman\Http\Request;
 use Webman\Route;
@@ -36,6 +39,23 @@ if (! function_exists('nyuwa_app')) {
     function nyuwa_app($abstract = null)
     {
         return Container::get($abstract);
+    }
+}
+
+if (!function_exists("nyuwa_dd")){
+    function nyuwa_dd($data,$var_dump = false){
+
+        ob_start();
+        if ($var_dump){
+            var_dump($data);
+        }else{
+            print_r($data);
+        }
+        $ob_get_contents = ob_get_contents();
+        ob_flush();
+        flush();
+
+        return response($ob_get_contents);
     }
 }
 
@@ -142,3 +162,96 @@ if (!function_exists("nyuwa_is_json")){
 }
 
 
+if (!function_exists("nyuwa_files")){
+    /**
+     * Get an array of all files in a directory.
+     */
+    function nyuwa_files(string $directory, bool $hidden = false){
+        return iterator_to_array(
+            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->sortByName(),
+            false
+        );
+    }
+}
+
+
+if (!function_exists("nyuwa_directories")) {
+    /**
+     * Get all of the directories within a given directory.
+     */
+    function nyuwa_directories(string $directory): array
+    {
+        $directories = [];
+
+        foreach (Finder::create()->in($directory)->directories()->depth(0)->sortByName() as $dir) {
+            $directories[] = $dir->getPathname();
+        }
+
+        return $directories;
+    }
+}
+
+
+
+if (! function_exists('push_queue_message')) {
+    /**
+     * 推送消息到队列
+     * @param QueueMessageVo $message
+     * @param array $receiveUsers
+     * @return int 消息ID，若失败返回 -1
+     * @throws Throwable
+     */
+    function push_queue_message(QueueMessageVo $message, array $receiveUsers = []): int
+    {
+        return container()
+            ->get(\App\System\Service\SystemQueueLogService::class)
+            ->pushMessage($message, $receiveUsers);
+    }
+}
+
+if (! function_exists('add_queue')) {
+    /**
+     * 添加任务到队列
+     * @param \App\System\Vo\AmqpQueueVo $amqpQueueVo
+     * @return bool
+     * @throws Throwable
+     */
+    function add_queue(\App\System\Vo\AmqpQueueVo $amqpQueueVo): bool
+    {
+        return container()
+            ->get(\App\System\Service\SystemQueueLogService::class)
+            ->addQueue($amqpQueueVo);
+    }
+}
+
+
+if (! function_exists('snowflake_id')) {
+    /**
+     * 生成雪花ID
+     * @return String
+     */
+    function snowflake_id($dataCenter = 1): String
+    {
+        $workerId = App::worker()->id??1;
+        $snowflake = Container::make(Snowflake::class,[$dataCenter,$workerId]);
+        return (string)$snowflake->id();
+    }
+}
+
+if (! function_exists('format_size')) {
+    /**
+     * 格式化大小
+     * @param int $size
+     * @return string
+     */
+    function format_size(int $size): string
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+        $index = 0;
+        for ($i = 0; $size >= 1024 && $i < 5; $i++) {
+            $size /= 1024;
+            $index = $i;
+        }
+        return round($size, 2) . $units[$index];
+    }
+}

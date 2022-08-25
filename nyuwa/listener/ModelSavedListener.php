@@ -26,8 +26,8 @@ class ModelSavedListener
      */
     public function handle(ModelSavedEvent $event)
     {
-        Log::info("ModelSavedListener事件触发了");
-        var_dump("ModelSavedListener事件触发了");
+//        Log::info("ModelSavedListener事件触发了");
+//        var_dump("ModelSavedListener事件触发了");
         // 使用 $event->order 来访问订单 ...
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace app\admin\service\system;
 
@@ -7,7 +8,6 @@ namespace app\admin\service\system;
 use app\admin\mapper\system\SystemRoleMapper;
 use DI\Annotation\Inject;
 use nyuwa\abstracts\AbstractService;
-use nyuwa\exception\NormalStatusException;
 
 class SystemRoleService extends AbstractService
 {

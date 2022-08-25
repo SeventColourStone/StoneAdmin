@@ -34,6 +34,7 @@ class JWTUtil
     public static function getToken()
     {
         $request = App::request();
+        //var_dump("获取的请求：".$request);
         $token = $request->header('Authorization') ?? '';
         $token = self::handleToken($token);
         return $token;

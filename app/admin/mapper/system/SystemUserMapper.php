@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace app\admin\mapper\system;
 
@@ -10,16 +11,26 @@ use Illuminate\Database\Eloquent\Builder;
 use nyuwa\abstracts\AbstractMapper;
 use nyuwa\NyuwaModel;
 
+/**
+ * 用户表
+ * Class SystemUserMapper
+ * @package app\admin\mapper\core
+ */
 class SystemUserMapper extends AbstractMapper
 {
+    /**
+     * @var SystemUser
+     */
+    public $model;
 
     public function assignModel()
     {
         $this->model = SystemUser::class;
     }
-    public function checkUserByUsername($username): array
+
+    public function checkUserByUsername($username)
     {
-        return $this->model::query()->where('username', $username)->firstOrFail()->toArray();
+        return $this->model::query()->where('username', $username)->firstOrFail();
     }
 
     /**
@@ -203,5 +214,4 @@ class SystemUserMapper extends AbstractMapper
         }
         return false;
     }
-
 }

@@ -1,23 +1,17 @@
 <?php
 
 
-namespace app\middleware;
+namespace App\middleware;
 
 
-use app\admin\service\system\SystemMenuService;
-use app\admin\service\system\SystemPermissionService;
 use app\admin\service\system\SystemUserService;
-use DI\Annotation\Inject;
-use nyuwa\exception\PermissionRefuseException;
 use nyuwa\exception\TokenException;
 use nyuwa\helper\LoginUser;
 use nyuwa\helper\NyuwaCode;
 use nyuwa\traits\ControllerTrait;
-use support\Log;
-use Webman\Http\Request;
-use Webman\Http\Response;
 use Webman\MiddlewareInterface;
-use Webman\Route;
+use Webman\Http\Response;
+use Webman\Http\Request;
 
 /**
  * 实现拦截器，做auth验证
@@ -48,12 +42,22 @@ class SystemAuthorizationMiddleware implements MiddlewareInterface
     public function process(Request $request, callable $handler): Response
     {
 
+        /**
+         * 不用授权的路由
+         */
         $noLoginPath = [
+            parse_url(config('plugin.webman.push.app.channel_hook'), PHP_URL_PATH),
+            "plugin/webman/push/hook",
+            "setting/config/getSysConfig",
+            "setting/config/getConfigByKey",
+
             "system/login",
             "system/captcha",
+            "core/systemLogin/login",
+            "core/systemLogin/captcha",
         ];
         $routeName = $request->route->getName();
-        var_dump("获取的路由别名:".$routeName);
+//        var_dump("获取的路由别名:".$routeName);
         //最初的path
         $originPath = $request->path();
         $standardPath = trim($originPath,"/");
@@ -66,37 +70,25 @@ class SystemAuthorizationMiddleware implements MiddlewareInterface
             array_shift($arr);
             $standardApiPath = implode("/",$arr);
         }
-        Log::info("路由记录:".$standardApiPath);
         if (in_array($standardApiPath,$noLoginPath)){
+//            var_dump('不需要鉴权.'.$standardApiPath);
+//            var_dump($handler($request));
             return $handler($request);
         }
 
-        //ui入口
-        $adminHome = "admin";
-        if ($standardPath == $adminHome){
-            //也需要登录验证。
-//            try {
-//                $this->loginUser = nyuwa_app(LoginUser::class);
-//                $bool = $this->loginUser->check();
-            return $handler($request);
-//            }catch (\Exception $e){
-            //重定向到登录页
-//                return $this->error($e->getMessage());
-//            }
-        }
+        //测试环境不允许dml操作
+//        $disableOp = ['update','delete','realDelete'];
+//        $basename = pathinfo($originPath)['basename'];
+//
+//        if (in_array($basename,$disableOp)){
+//            return $this->error("测试环境不允许该操作",NyuwaCode::NO_PERMISSION);
+//        }
 
-        //ui 渲染页面放行。
-        $pos = strpos($standardPath, "ui");
-        if ($pos !== false && $pos == 0){
-            return $handler($request);
-        }
 
         $this->loginUser = nyuwa_app(LoginUser::class);
         $bool = false;
         try {
-            Log::info("当前未走验证时间:".microtime());
             $bool = $this->loginUser->check();
-//            Log::info("当前验证时间:".microtime());
 //            //验证过的才有资格验权限
 //            $arr = explode("/",$originPath);
 //            $permissionCode = implode(":",array_filter($arr));
@@ -110,13 +102,13 @@ class SystemAuthorizationMiddleware implements MiddlewareInterface
 //            //权限配置 要么可配可以访问的，要么可配禁止访问的，二选一
 //            if (in_array($permissionCode, $codes)) {
 //                //放行
-                return $handler($request);
+            return $handler($request);
 //            }
 //            return response($this->error(nyuwa_trans('system.no_permission') . ' -> [ ' . $request->path() . ' ]'));
 
             //permission 验证
         }catch (TokenException $e){
-            return $this->error($e->getMessage(),NyuwaCode::TOKEN_EXPIRED);
+            return $this->error($e->getMessage(),NyuwaCode::TOKEN_EXPIRED)->withStatus(401);
         } catch (\Exception $e){
             return $this->error($e->getMessage());
         }

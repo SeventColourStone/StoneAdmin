@@ -1,18 +1,23 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 namespace nyuwa\event;
 
-
-use App\System\Model\SystemUploadfile;
+use app\admin\model\system\SystemUploadfile;
 use League\Flysystem\Filesystem;
 
 class RealDeleteUploadFile
 {
+    /**
+     * @var SystemUploadfile
+     */
     protected $model;
 
     protected $confirm = true;
 
+    /**
+     * @var Filesystem
+     */
     protected $filesystem;
 
     public function __construct(SystemUploadfile $model, Filesystem $filesystem)

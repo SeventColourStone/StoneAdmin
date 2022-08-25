@@ -14,220 +14,33 @@
 
 use Webman\Route;
 
-
-//无须auth
-Route::group("/api/system",function (){
-    Route::any('/login', [app\admin\controller\api\system\LoginController::class, 'login']);//验证码
-    Route::get('/captcha', [app\admin\controller\api\system\LoginController::class, 'getCaptcha']);
+Route::get("/",function (){
+    return response("welcome to stone admin !");
 });
 
-//需要auth
-Route::group("/api",function (){
-
-        Route::group("/setting",function () {
-            Route::group("/config",function (){
-
-                Route::any('/getSysConfig', [app\admin\controller\api\system\setting\SystemConfigController::class, 'getSysConfig']);
-                Route::any('/getSystemConfig', [app\admin\controller\api\system\setting\SystemConfigController::class, 'getSystemGroupConfig']);
-                Route::any('/getExtendConfig', [app\admin\controller\api\system\setting\SystemConfigController::class, 'getExtendGroupConfig']);
-                Route::any('/getConfigByGroup', [app\admin\controller\api\system\setting\SystemConfigController::class, 'getConfigByGroup']);
-                Route::any('/getConfigByKey', [app\admin\controller\api\system\setting\SystemConfigController::class, 'getConfigByKey']);
-                Route::any('/saveSystemConfig', [app\admin\controller\api\system\setting\SystemConfigController::class, 'saveSystemConfig']);
-                Route::any('/save', [app\admin\controller\api\system\setting\SystemConfigController::class, 'save']);
-                Route::any('/update', [app\admin\controller\api\system\setting\SystemConfigController::class, 'update']);
-                Route::any('/delete', [app\admin\controller\api\system\setting\SystemConfigController::class, 'delete']);
-                Route::any('/clearCache', [app\admin\controller\api\system\setting\SystemConfigController::class, 'clearCache']);
-            });
-        });
-
-        Route::group("/system",function (){
-
-            Route::any('/logout', [app\admin\controller\api\system\LoginController::class, 'logout']);
-            Route::any('/getInfo', [app\admin\controller\api\system\LoginController::class, 'getInfo']);
-            Route::any('/refresh', [app\admin\controller\api\system\LoginController::class, 'refresh']);
-
-            Route::group("/user",function (){
-                Route::any('/index', [app\admin\controller\api\system\userCenter\UserController::class, 'index'])->name("api:system:userCenter:user:index");
-                Route::any('/recycle', [app\admin\controller\api\system\userCenter\UserController::class, 'recycle'])->name("api:system:userCenter:user:recycle");
-                Route::any('/save', [app\admin\controller\api\system\userCenter\UserController::class, 'save'])->name("api:system:userCenter:user:save");
-                Route::any('/read', [app\admin\controller\api\system\userCenter\UserController::class, 'read'])->name("api:system:userCenter:user:read");
-                Route::any('/update', [app\admin\controller\api\system\userCenter\UserController::class, 'update'])->name("api:system:userCenter:user:update");
-                Route::any('/delete', [app\admin\controller\api\system\userCenter\UserController::class, 'delete'])->name("api:system:userCenter:user:delete");
-                Route::any('/realDelete', [app\admin\controller\api\system\userCenter\UserController::class, 'realDelete'])->name("api:system:userCenter:user:realDelete");
-                Route::any('/recovery', [app\admin\controller\api\system\userCenter\UserController::class, 'recovery'])->name("api:system:userCenter:user:recovery");
-                Route::any('/changeStatus', [app\admin\controller\api\system\userCenter\UserController::class, 'changeStatus'])->name("api:system:userCenter:user:changeStatus");
-                Route::any('/clearCache', [app\admin\controller\api\system\userCenter\UserController::class, 'clearCache'])->name("api:system:userCenter:user:clearCache");
-                Route::any('/setHomePage', [app\admin\controller\api\system\userCenter\UserController::class, 'setHomePage'])->name("api:system:userCenter:user:setHomePage");
-                Route::any('/initUserPassword', [app\admin\controller\api\system\userCenter\UserController::class, 'initUserPassword'])->name("api:system:userCenter:user:initUserPassword");
-                Route::any('/updateInfo', [app\admin\controller\api\system\userCenter\UserController::class, 'updateInfo'])->name("api:system:userCenter:user:updateInfo");
-                Route::any('/modifyPassword', [app\admin\controller\api\system\userCenter\UserController::class, 'modifyPassword'])->name("api:system:userCenter:user:modifyPassword");
-                Route::any('/clearSelfCache', [app\admin\controller\api\system\userCenter\UserController::class, 'clearSelfCache'])->name("api:system:userCenter:user:clearSelfCache");
-                Route::any('/export', [app\admin\controller\api\system\userCenter\UserController::class, 'export'])->name("api:system:userCenter:user:export");
-                Route::any('/import', [app\admin\controller\api\system\userCenter\UserController::class, 'import'])->name("api:system:userCenter:user:import");
-                Route::any('/downloadTemplate', [app\admin\controller\api\system\userCenter\UserController::class, 'downloadTemplate'])->name("api:system:userCenter:user:downloadTemplate");
-            });
-
-            Route::group("/role",function (){
-                Route::any('/index', [app\admin\controller\api\system\userCenter\RoleController::class, 'index'])->name("api:system:userCenter:role:index");
-                Route::any('/recycle', [app\admin\controller\api\system\userCenter\RoleController::class, 'recycle'])->name("api:system:userCenter:role:recycle");
-                Route::any('/save', [app\admin\controller\api\system\userCenter\RoleController::class, 'save'])->name("api:system:userCenter:role:save");
-                Route::any('/update', [app\admin\controller\api\system\userCenter\RoleController::class, 'update'])->name("api:system:userCenter:role:update");
-                Route::any('/delete', [app\admin\controller\api\system\userCenter\RoleController::class, 'delete'])->name("api:system:userCenter:role:delete");
-                Route::any('/realDelete', [app\admin\controller\api\system\userCenter\RoleController::class, 'realDelete'])->name("api:system:userCenter:role:realDelete");
-                Route::any('/recovery', [app\admin\controller\api\system\userCenter\RoleController::class, 'recovery'])->name("api:system:userCenter:role:recovery");
-                Route::any('/changeStatus', [app\admin\controller\api\system\userCenter\RoleController::class, 'changeStatus'])->name("api:system:userCenter:role:changeStatus");
-
-                Route::any('/list', [app\admin\controller\api\system\userCenter\RoleController::class, 'list'])->name("api:system:userCenter:role:list");
-                Route::any('/menuPermission', [app\admin\controller\api\system\userCenter\RoleController::class, 'menuPermission'])->name("api:system:userCenter:role:menuPermission");
-                Route::any('/dataPermission', [app\admin\controller\api\system\userCenter\RoleController::class, 'dataPermission'])->name("api:system:userCenter:role:dataPermission");
+Route::group("/system",function (){
+    Route::any('/login', [app\admin\controller\LoginController::class, 'login']);//验证码
+    Route::any('/captcha', [app\admin\controller\LoginController::class, 'captcha']);
+    Route::any('/logout', [app\admin\controller\LoginController::class, 'logout']);
+    Route::any('/refresh', [app\admin\controller\LoginController::class, 'refresh']);
+    Route::any('/getInfo', [app\admin\controller\LoginController::class, 'getInfo']);//用户信息
 
 
-                Route::any('/getMenuByRole', [app\admin\controller\api\system\userCenter\RoleController::class, 'getMenuByRole'])->name("api:system:userCenter:role:getMenuByRole");
-                Route::any('/getDeptByRole', [app\admin\controller\api\system\userCenter\RoleController::class, 'getDeptByRole'])->name("api:system:userCenter:role:getDeptByRole");
-            });
+    Route::any('/uploadFile', [app\admin\controller\UploadController::class, 'uploadFile']);
+    Route::any('/uploadImage', [app\admin\controller\UploadController::class, 'uploadImage']);
+    Route::any('/saveNetworkImage', [app\admin\controller\UploadController::class, 'saveNetworkImage']);
+    Route::any('/getAllFiles', [app\admin\controller\UploadController::class, 'getAllFiles']);
+    Route::any('/getFileInfo', [app\admin\controller\UploadController::class, 'getFileInfo']);
+    Route::any('/download', [app\admin\controller\UploadController::class, 'download']);
 
-            Route::group("/menu",function (){
-                Route::any('/index', [app\admin\controller\api\system\userCenter\MenuController::class, 'index'])->name("api:system:userCenter:menu:index");
-                Route::any('/recycle', [app\admin\controller\api\system\userCenter\MenuController::class, 'recycle'])->name("api:system:userCenter:menu:recycle");
-                Route::any('/save', [app\admin\controller\api\system\userCenter\MenuController::class, 'save'])->name("api:system:userCenter:menu:save");
-                Route::any('/update', [app\admin\controller\api\system\userCenter\MenuController::class, 'update'])->name("api:system:userCenter:menu:update");
-                Route::any('/delete', [app\admin\controller\api\system\userCenter\MenuController::class, 'delete'])->name("api:system:userCenter:menu:delete");
-                Route::any('/realDelete', [app\admin\controller\api\system\userCenter\MenuController::class, 'realDelete'])->name("api:system:userCenter:menu:realDelete");
-                Route::any('/recovery', [app\admin\controller\api\system\userCenter\MenuController::class, 'recovery'])->name("api:system:userCenter:menu:recovery");
-                Route::any('/tree', [app\admin\controller\api\system\userCenter\MenuController::class, 'tree'])->name("api:system:userCenter:menu:tree");
-
-            });
-
-            //标准一组操作api，单表模式，gen code单表使用这个模式。
-            Route::group("/post",function (){
-                Route::any('/index', [app\admin\controller\api\system\userCenter\PostController::class, 'index'])->name("api:system:userCenter:post:index");
-                Route::any('/recycle', [app\admin\controller\api\system\userCenter\PostController::class, 'recycle'])->name("api:system:userCenter:post:recycle");
-                Route::any('/list', [app\admin\controller\api\system\userCenter\PostController::class, 'list'])->name("api:system:userCenter:post:list");
-                Route::any('/save', [app\admin\controller\api\system\userCenter\PostController::class, 'save'])->name("api:system:userCenter:post:save");
-                Route::any('/read', [app\admin\controller\api\system\userCenter\PostController::class, 'read'])->name("api:system:userCenter:post:read");
-                Route::any('/update', [app\admin\controller\api\system\userCenter\PostController::class, 'update'])->name("api:system:userCenter:post:update");
-                Route::any('/delete', [app\admin\controller\api\system\userCenter\PostController::class, 'delete'])->name("api:system:userCenter:post:delete");
-                Route::any('/realDelete', [app\admin\controller\api\system\userCenter\PostController::class, 'realDelete'])->name("api:system:userCenter:post:realDelete");
-                Route::any('/recovery', [app\admin\controller\api\system\userCenter\PostController::class, 'recovery'])->name("api:system:userCenter:post:recovery");
-                Route::any('/changeStatus', [app\admin\controller\api\system\userCenter\PostController::class, 'changeStatus'])->name("api:system:userCenter:post:changeStatus");
-
-
-
-            });
-            Route::group("/dept",function (){
-                Route::any('/index', [app\admin\controller\api\system\userCenter\DeptController::class, 'index'])->name("api:system:userCenter:dept:index");
-                Route::any('/recycle', [app\admin\controller\api\system\userCenter\DeptController::class, 'recycleTree'])->name("api:system:userCenter:dept:recycleTree");
-                Route::any('/save', [app\admin\controller\api\system\userCenter\DeptController::class, 'save'])->name("api:system:userCenter:dept:save");
-//                Route::any('/read', [app\admin\controller\api\system\userCenter\DeptController::class, 'read']);
-                Route::any('/update', [app\admin\controller\api\system\userCenter\DeptController::class, 'update'])->name("api:system:userCenter:dept:update");
-                Route::any('/delete', [app\admin\controller\api\system\userCenter\DeptController::class, 'delete'])->name("api:system:userCenter:dept:delete");
-                Route::any('/realDelete', [app\admin\controller\api\system\userCenter\DeptController::class, 'realDelete'])->name("api:system:userCenter:dept:realDelete");
-                Route::any('/recovery', [app\admin\controller\api\system\userCenter\DeptController::class, 'recovery'])->name("api:system:userCenter:dept:recovery");
-                Route::any('/changeStatus', [app\admin\controller\api\system\userCenter\DeptController::class, 'changeStatus'])->name("api:system:userCenter:dept:changeStatus");
-
-
-                Route::any('/recycleTree', [app\admin\controller\api\system\userCenter\DeptController::class, 'recycleTree'])->name("api:system:userCenter:dept:recycleTree");
-                Route::any('/tree', [app\admin\controller\api\system\userCenter\DeptController::class, 'tree'])->name("api:system:userCenter:dept:tree");
-
-
-            });
-
-            Route::group("/dataDict",function (){
-                Route::any('/index', [app\admin\controller\api\system\dataCenter\DictDataController::class, 'index'])->name("api:system:userCenter:dataDict:index");
-                Route::any('/list', [app\admin\controller\api\system\dataCenter\DictDataController::class, 'list'])->name("api:system:userCenter:dataDict:list");
-                Route::any('/lists', [app\admin\controller\api\system\dataCenter\DictDataController::class, 'lists'])->name("api:system:userCenter:dataDict:lists");
-                Route::any('/clearCache', [app\admin\controller\api\system\dataCenter\DictDataController::class, 'clearCache'])->name("api:system:userCenter:dataDict:clearCache");
-                Route::any('/recycle', [app\admin\controller\api\system\dataCenter\DictDataController::class, 'recycle'])->name("api:system:userCenter:dataDict:recycle");
-                Route::any('/save', [app\admin\controller\api\system\dataCenter\DictDataController::class, 'save'])->name("api:system:userCenter:dataDict:save");
-                Route::any('/read', [app\admin\controller\api\system\dataCenter\DictDataController::class, 'read'])->name("api:system:userCenter:dataDict:read");
-                Route::any('update', [app\admin\controller\api\system\dataCenter\DictDataController::class, 'update'])->name("api:system:userCenter:dataDict:update");
-                Route::any('delete', [app\admin\controller\api\system\dataCenter\DictDataController::class, 'delete'])->name("api:system:userCenter:dataDict:delete");
-                Route::any('realDelete', [app\admin\controller\api\system\dataCenter\DictDataController::class, 'realDelete'])->name("api:system:userCenter:dataDict:realDelete");
-                Route::any('recovery', [app\admin\controller\api\system\dataCenter\DictDataController::class, 'recovery'])->name("api:system:userCenter:dataDict:recovery");
-                Route::any('changeStatus', [app\admin\controller\api\system\dataCenter\DictDataController::class, 'changeStatus'])->name("api:system:userCenter:dataDict:changeStatus");
-            });
-
-
-            /**
-             * 字典类型
-             * 释义：根据这里可以把对应上字段典，并找到对应的字典数据，开启表字段到字典数据的自动转换。
-             */
-            Route::group("/dictType",function (){
-                Route::any('/index', [app\admin\controller\api\system\dataCenter\DictTypeController::class, 'index'])->name("api:system:userCenter:dictType:index");
-                Route::any('/recycle', [app\admin\controller\api\system\dataCenter\DictTypeController::class, 'recycle'])->name("api:system:userCenter:dictType:recycle");
-                Route::any('/save', [app\admin\controller\api\system\dataCenter\DictTypeController::class, 'save'])->name("api:system:userCenter:dictType:save");
-                Route::any('/read', [app\admin\controller\api\system\dataCenter\DictTypeController::class, 'read'])->name("api:system:userCenter:dictType:read");
-                Route::any('/update', [app\admin\controller\api\system\dataCenter\DictTypeController::class, 'update'])->name("api:system:userCenter:dictType:update");
-                Route::any('/delete', [app\admin\controller\api\system\dataCenter\DictTypeController::class, 'delete'])->name("api:system:userCenter:dictType:delete");
-                Route::any('/realDelete', [app\admin\controller\api\system\dataCenter\DictTypeController::class, 'realDelete'])->name("api:system:userCenter:dictType:realDelete");
-                Route::any('/recovery', [app\admin\controller\api\system\dataCenter\DictTypeController::class, 'recovery'])->name("api:system:userCenter:dictType:recovery");
-            });
-
-
-            /**
-             * 字段典
-             * 释义：根据这里可以把业务表状态字段映射到对应的字典类型
-             */
-            Route::group("/dictField",function (){
-                Route::any('/index', [app\admin\controller\api\system\dataCenter\DictFieldController::class, 'index'])->name("api:system:userCenter:dictField:index");
-                Route::any('/recycle', [app\admin\controller\api\system\dataCenter\DictFieldController::class, 'recycle'])->name("api:system:userCenter:dictField:recycle");
-                Route::any('/save', [app\admin\controller\api\system\dataCenter\DictFieldController::class, 'save'])->name("api:system:userCenter:dictField:save");
-                Route::any('/read', [app\admin\controller\api\system\dataCenter\DictFieldController::class, 'read'])->name("api:system:userCenter:dictField:read");
-                Route::any('/update', [app\admin\controller\api\system\dataCenter\DictFieldController::class, 'update'])->name("api:system:userCenter:dictField:update");
-                Route::any('/delete', [app\admin\controller\api\system\dataCenter\DictFieldController::class, 'delete'])->name("api:system:userCenter:dictField:delete");
-                Route::any('/realDelete', [app\admin\controller\api\system\dataCenter\DictFieldController::class, 'realDelete'])->name("api:system:userCenter:dictField:realDelete");
-                Route::any('/recovery', [app\admin\controller\api\system\dataCenter\DictFieldController::class, 'recovery'])->name("api:system:userCenter:dictField:recovery");
-            });
-
-            /**
-             * 数据源
-             * 释义：根据这里可以获取所有的业务表
-             * dataMaintain
-             *
-             */
-            Route::group("/dataSource",function (){
-                Route::any('/index', [app\admin\controller\api\system\dataCenter\DataSourceController::class, 'index'])->name("api:system:userCenter:dataSource:index");//数据库表列表
-                Route::any('/detailed', [app\admin\controller\api\system\dataCenter\DataSourceController::class, 'detailed'])->name("api:system:userCenter:dataSource:detailed");//数据表字段列表
-                Route::any('/optimize', [app\admin\controller\api\system\dataCenter\DataSourceController::class, 'optimize'])->name("api:system:userCenter:dataSource:optimize");//优化表
-                Route::any('/fragment', [app\admin\controller\api\system\dataCenter\DataSourceController::class, 'fragment'])->name("api:system:userCenter:dataSource:fragment");//清理表碎片
-            });
-
-
-
-
-
-            Route::group("/notice",function (){
-                Route::any('/index', [app\admin\controller\api\system\dataCenter\NoticeController::class, 'index'])->name("api:system:userCenter:notice:index");;
-                Route::any('/recycle', [app\admin\controller\api\system\dataCenter\NoticeController::class, 'recycle']);
-                Route::any('/save', [app\admin\controller\api\system\dataCenter\NoticeController::class, 'save']);
-                Route::any('/read', [app\admin\controller\api\system\dataCenter\NoticeController::class, 'read']);
-                Route::any('/update', [app\admin\controller\api\system\dataCenter\NoticeController::class, 'update']);
-                Route::any('/delete', [app\admin\controller\api\system\dataCenter\NoticeController::class, 'delete']);
-                Route::any('/realDelete', [app\admin\controller\api\system\dataCenter\NoticeController::class, 'realDelete']);
-                Route::any('/recovery', [app\admin\controller\api\system\dataCenter\NoticeController::class, 'recovery']);
-            });
-
-
-            Route::group("/onlineUser",function (){
-                Route::any('/index', [app\admin\controller\api\system\monitorCenter\OnlineUserMonitorController::class, 'getPageList']);
-                Route::any('/kick', [app\admin\controller\api\system\monitorCenter\OnlineUserMonitorController::class, 'kickUser']);
-            });
-
-        });
 
 });
-
-
-//基础表格模板
-
-
-
 
 
 
 //自动路由解析
 
-$dir_iterator = new \RecursiveDirectoryIterator(app_path());//.DS."adminUi"
+$dir_iterator = new \RecursiveDirectoryIterator(app_path());
 //ui自动引入路由
 $iterator = new \RecursiveIteratorIterator($dir_iterator);
 foreach ($iterator as $file) {
@@ -283,7 +96,7 @@ foreach ($iterator as $file) {
         }
         foreach ($uriPathArr as $uri){
 //            echo "Route $uri [{$cb[0]}, {$cb[1]}]\n";
-            \support\Log::info("$routeName Route $uri [{$cb[0]}, {$cb[1]}]");
+//            \support\Log::info("$routeName Route $uri [{$cb[0]}, {$cb[1]}]");
             Route::any($uri, $cb)->name($routeName);
             Route::any($uri.'/', $cb)->name($routeName);
         }
@@ -301,9 +114,9 @@ foreach ($iterator as $file) {
             continue;
         }
         // action为index时uri里末尾/index可以省略
-//        if ($action === 'index') {
-//            $route($uri_path, [$class_name, $action]);
-//        }
+        if ($action === 'index') {
+            $route($uri_path, [$class_name, $action]);
+        }
         $route($uri_path.'/'.$action, [$class_name, $action]);
 
     }

@@ -1,0 +1,27 @@
+<?php
+declare(strict_types=1);
+/**
+
+ */
+namespace {NAMESPACE};
+
+use Mine\MineFormRequest;
+
+/**
+ * {COMMENT}
+ */
+class {CLASS_NAME} extends MineFormRequest
+{
+    /**
+     * 公共规则
+     */
+    public function commonRules(): array
+    {
+        return [];
+    }
+
+    {RULES}
+
+    {ATTRIBUTES}
+
+}

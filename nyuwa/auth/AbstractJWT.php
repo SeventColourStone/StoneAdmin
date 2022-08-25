@@ -14,10 +14,9 @@ abstract class AbstractJWT
      * 获取jwt token
      *
      * @param array $claims
-     * @param string $scene
      * @return array
      */
-    abstract public function createToken(array $claims,string $scene):array;
+    abstract public function createToken(array $claims):string;
 
     /**
      * 对jwt token进行验证
@@ -50,7 +49,7 @@ abstract class AbstractJWT
      * @param string $token
      * @return array
      */
-    abstract public function refreshToken(string $token): array;
+    abstract public function refreshToken(string $token): string;
 
     /**
      * 获取JWT token的claims部分

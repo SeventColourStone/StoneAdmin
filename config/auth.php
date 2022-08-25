@@ -81,8 +81,6 @@ return [
          */
         'cache_prefix' => 'stone-jwt',
 
-        'app_model' =>  App\Model\Test::class,
-
         /**
          * 区分不同场景的token，比如你一个项目可能会有多种类型的应用接口鉴权,下面自行定义，我只是举例子
          * 下面的配置会自动覆盖根配置，比如application1会里面的数据会覆盖掉根数据
@@ -92,12 +90,15 @@ return [
          */
         'scene' => [
             'default' => [
+                'secret' => 'saagasgasgagassgasgasg', // 非对称加密使用字符串,请使用自己加密的字符串
+                'login_type' => 'sso', //  登录方式，sso为单点登录，mpop为多点登录
+                'sso_key' => 'id',
                 'ttl' => 7200,
             ],
-            'application' => [
+            'bbsweb' => [
                 'secret' => 'application', // 非对称加密使用字符串,请使用自己加密的字符串
                 'login_type' => 'sso', //  登录方式，sso为单点登录，mpop为多点登录
-                'sso_key' => 'uid',
+                'sso_key' => 'id',
                 'ttl' => 7200, // token过期时间，单位为秒
             ],
             'application1' => [

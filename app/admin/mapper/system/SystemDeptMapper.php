@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace app\admin\mapper\system;
 
@@ -8,6 +9,11 @@ use app\admin\model\system\SystemDept;
 use Illuminate\Database\Eloquent\Builder;
 use nyuwa\abstracts\AbstractMapper;
 
+/**
+ * 部门信息表
+ * Class SystemDeptMapper
+ * @package app\admin\mapper\core
+ */
 class SystemDeptMapper extends AbstractMapper
 {
     /**
@@ -19,7 +25,6 @@ class SystemDeptMapper extends AbstractMapper
     {
         $this->model = SystemDept::class;
     }
-
 
     /**
      * 获取前端选择树
@@ -45,17 +50,16 @@ class SystemDeptMapper extends AbstractMapper
     }
 
     /**
-     * @param string $id
+     * @param int $id
      * @return bool
      */
-    public function checkChildrenExists(string $id): bool
+    public function checkChildrenExists(int $id): bool
     {
         return $this->model::withTrashed()->where('parent_id', $id)->exists();
     }
 
     /**
      * 搜索处理器
-     * @param Builder $query
      * @param array $params
      * @return Builder
      */

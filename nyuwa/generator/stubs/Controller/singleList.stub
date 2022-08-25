@@ -1,0 +1,10 @@
+
+    /**
+     * 列表
+     * @return NyuwaResponse
+     */
+    #[GetMapping("index"), Permission("{INDEX_PERMISSION}")]
+    public function index(Request $request): NyuwaResponse
+    {
+        return $this->success($this->service->getPageList($request->all()));
+    }

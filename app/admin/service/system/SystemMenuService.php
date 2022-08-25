@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
 
 namespace app\admin\service\system;
 
 
 use app\admin\mapper\system\SystemMenuMapper;
 use app\admin\model\system\SystemMenu;
+use app\admin\model\system\SystemUser;
 use DI\Annotation\Inject;
 use nyuwa\abstracts\AbstractService;
 
@@ -19,13 +21,19 @@ class SystemMenuService extends AbstractService
 
 
     /**
+     * @Inject
+     * @var SystemRoleService
+     */
+    protected $sysRoleService;
+
+
+    /**
      * @param array|null $params
      * @return array
      */
     public function getTreeList(?array $params = null): array
     {
-        $select = "id,parent_id,level,name as title,icon,redirect as href,type,open_type as openType";
-        $params = array_merge(['orderBy' => 'sort', 'orderType' => 'asc','select' =>$select], $params);
+        $params = array_merge(['orderBy' => 'sort', 'orderType' => 'desc'], $params);
         return parent::getTreeList($params);
     }
 
@@ -52,8 +60,6 @@ class SystemMenuService extends AbstractService
      * 通过code获取菜单名称
      * @param string $code
      * @return string
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function findNameByCode(string $code): string
     {
@@ -74,10 +80,10 @@ class SystemMenuService extends AbstractService
         $id = $this->mapper->save($this->handleData($data));
 
         // 生成RESTFUL按钮菜单
-//        if ($data['type'] == SystemMenu::MENUS_LIST && $data['restful'] == '0') {
-//            $model = $this->mapper->model::find($id, ['id', 'name', 'code']);
-//            $this->genButtonMenu($model);
-//        }
+        if ($data['type'] == SystemMenu::MENUS_LIST && $data['restful'] == '0') {
+            $model = $this->mapper->model::find($id, ['id', 'name', 'code']);
+            $this->genButtonMenu($model);
+        }
 
         return $id;
     }
@@ -132,15 +138,17 @@ class SystemMenuService extends AbstractService
      * @return mixed
      */
     protected function handleData($data) {
-        if ($data['parent_id'] == 0) {
-            $data['level'] = '0';
-            $data['type'] = SystemMenu::DIRECTORY_LIST;
-        } else {
-            if (is_array($data['parent_id'])) {
-                $data['parent_id'] = array_pop($data['parent_id']);
+        if (isset($data['parent_id'])){
+            if ($data['parent_id'] == 0) {
+                $data['level'] = '0';
+                $data['type'] = SystemMenu::DIRECTORY_LIST;
+            } else {
+                if (is_array($data['parent_id'])) {
+                    $data['parent_id'] = array_pop($data['parent_id']);
+                }
+                $parentMenu = $this->mapper->read((string)$data['parent_id']);
+                $data['level'] = $parentMenu['level'] . ',' . $parentMenu['id'];
             }
-            $parentMenu = $this->mapper->read((int) $data['parent_id']);
-            $data['level'] = $parentMenu['level'] . ',' . $parentMenu['id'];
         }
         return $data;
     }
@@ -156,7 +164,7 @@ class SystemMenuService extends AbstractService
         // 跳过的菜单
         $ctuIds = [];
         if (count($ids)) foreach ($ids as $id) {
-            if (!$this->checkChildrenExists( (int) $id)) {
+            if (!$this->checkChildrenExists($id)) {
                 $this->mapper->realDelete([$id]);
             } else {
                 array_push($ctuIds, $id);
@@ -170,8 +178,72 @@ class SystemMenuService extends AbstractService
      * @param int $id
      * @return bool
      */
-    public function checkChildrenExists(int $id): bool
+    public function checkChildrenExists(string $id): bool
     {
         return $this->mapper->checkChildrenExists($id);
     }
+
+    /**
+     * 过滤通过角色查询出来的菜单id列表，并去重
+     * @param array $roleData
+     * @return array
+     */
+    public function filterMenuIds(array &$roleData): array
+    {
+        $ids = [];
+        foreach ($roleData as $roleDatum) {
+            foreach ($roleDatum['menus'] as $menu) {
+                $ids[] = $menu['id'];
+            }
+        }
+        unset($roleData);
+        return array_unique($ids);
+    }
+
+    /**
+     * 获取用户菜单树
+     */
+    public function userMenu($params){
+
+        $loginUser = nyuwa_user();
+        if ($loginUser->isSuperAdmin()) {
+            //全部路由绿灯
+            return $this->mapper->getSuperAdminMenu();
+        } else {
+            $userId = $loginUser->getId();
+            $systemUser = SystemUser::query()->find($userId);
+            $roles = $this->sysRoleService->mapper->getMenuIdsByRoleIds($systemUser->roles()->pluck('id')->toArray());
+            $ids = $this->filterMenuIds($roles);
+            return $this->mapper->getMenuByIds($ids);
+        }
+    }
+
+    /**
+     * 获取用户菜单树
+     */
+    public function userMenu1(){
+//        $data['routers'] = $this->mapper->getSuperAdminRouters();
+        return $this->mapper->getSuperAdminMenu();
+//        $userId = (int)nyuwa_user()->getId();
+//        SystemUser::find($userId);
+//        $this->getTreeList();
+//        $user = nyuwa_user();
+//        if ($user->isSuperAdmin()) {
+//            //全部路由绿灯
+//            $data['routers'] = $this->mapper->getSuperAdminRouters();
+//        } else {
+//            $roles = $this->sysRoleService->mapper->getMenuIdsByRoleIds($user->roles()->pluck('id')->toArray());
+//            $ids = $this->sysUserService->filterMenuIds($roles);
+//            $data['roles'] = $user->roles()->pluck('code')->toArray();
+//            $data['routers'] = $this->mapper->getRoutersByIds($ids);
+//            $data['codes'] = $this->mapper->getMenuCode($ids);
+//            $select = "id,parent_id,level,name as title,icon,redirect as href,type,open_type as openType";
+//            if (isset($params['select'])){
+//                $select = $params['select'];
+//            }
+//            $params = array_merge(['orderBy' => 'sort', 'orderType' => 'asc','select' =>$select], $params);
+//            return parent::getTreeList($params);
+//        }
+    }
+
 }

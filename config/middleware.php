@@ -12,20 +12,16 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-return [
+use App\middleware\SystemAuthorizationMiddleware;
 
+return [
     // 全局中间件
     '' => [
-        app\middleware\ActionHook::class,
-//        app\middleware\AuthCheckTest::class,
-//        app\middleware\AccessControlTest::class,
+        // ... 这里省略其它中间件
+        //操作日记中间件
+//        app\middleware\OperLogMiddleware::class,
     ],
-    // api应用中间件(应用中间件仅在多应用模式下有效)
-    'api' => [
-//        app\middleware\ApiOnly::class,
-    ],
-    "admin" => [
-        \app\middleware\SystemAuthorizationMiddleware::class,
-//        \app\middleware\SystemViewMiddleware::class
+    'admin' => [
+        SystemAuthorizationMiddleware::class
     ]
 ];

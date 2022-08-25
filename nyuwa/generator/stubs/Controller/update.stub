@@ -1,0 +1,12 @@
+
+    /**
+     * 更新
+     * @return NyuwaResponse
+     */
+    #[PutMapping("update/{id}"), Permission("{UPDATE_PERMISSION}"), OperationLog]
+    public function update(Request $request): NyuwaResponse
+    {
+        $this->validate->scene("update")->check($request->all());
+        $data = $request->all();
+        return $this->service->update($data["id"], $data) ? $this->success() : $this->error();
+    }

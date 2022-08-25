@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace app\admin\model\system;
 
@@ -7,9 +8,11 @@ namespace app\admin\model\system;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use nyuwa\NyuwaModel;
-use nyuwa\traits\ModelCacheTrait;
-
 /**
+ * 字典表转换
+ * Class SystemDictField
+ * @package app\admin\model\core
+ *
  * @property int $id 主键
  * @property int $dict_type_id system_dict_type 关联id
  * @property string $table_name 表名
@@ -49,6 +52,7 @@ class SystemDictField extends NyuwaModel
      */
     protected $casts = ['id' => 'string', 'created_by' => 'string', 'updated_by' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
+
     /**
      * 关联字典类型表表
      */
@@ -56,5 +60,4 @@ class SystemDictField extends NyuwaModel
     {
         return $this->hasOne(SystemDictType::class, 'id', 'dict_type_id');
     }
-
 }

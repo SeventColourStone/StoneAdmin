@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace app\admin\mapper\system;
 
@@ -8,6 +9,11 @@ use app\admin\model\system\SystemPost;
 use Illuminate\Database\Eloquent\Builder;
 use nyuwa\abstracts\AbstractMapper;
 
+/**
+ * 岗位表
+ * Class SystemPostMapper
+ * @package app\admin\mapper\core
+ */
 class SystemPostMapper extends AbstractMapper
 {
     /**
@@ -39,5 +45,4 @@ class SystemPostMapper extends AbstractMapper
         }
         return $query;
     }
-
 }

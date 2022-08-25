@@ -1,12 +1,6 @@
 <?php
 /**
- * MineAdmin is committed to providing solutions for quickly building web applications
- * Please view the LICENSE file that was distributed with this source code,
- * For the full copyright and license information.
- * Thank you very much for using MineAdmin.
- *
- * @Author X.Mo<root@imoi.cn>
- * @Link   https://gitee.com/xmo/MineAdmin
+
  */
 
 namespace nyuwa\traits;
@@ -21,6 +15,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\HigherOrderTapProxy;
 use nyuwa\NyuwaCollection;
 use nyuwa\NyuwaModel;
+use support\Db;
 use support\Model;
 use function DI\string;
 
@@ -30,6 +25,15 @@ trait MapperTrait
      * @var NyuwaModel
      */
     public $model;
+
+    /**
+     * @var integer
+     */
+    public $userId = 0;
+
+    public function setUserId($userId){
+        $this->userId = $userId;
+    }
 
     /**
      * 获取列表数据
@@ -50,7 +54,7 @@ trait MapperTrait
      * @return array
      */
 
-    public function getPageList(?array $params, bool $isScope = true, string $pageName = 'page'): array
+    public function  getPageList(?array $params, bool $isScope = true, string $pageName = 'page'): array
     {
         $paginate = $this->listQuerySetting($params, $isScope)->paginate(
             $params['pageSize'] ?? $this->model::PAGE_SIZE, ['*'], $pageName, $params[$pageName] ?? 1
@@ -65,7 +69,7 @@ trait MapperTrait
      */
     public function setPaginate(LengthAwarePaginator $paginate): array
     {
-        $this->handleTransform(Collection::make($paginate->items()));
+//        $this->handleTransform(Collection::make($paginate->items()));
         return [
             'items' => $paginate->items(),
             'pageInfo' => [
@@ -96,8 +100,9 @@ trait MapperTrait
         $params['_mainAdmin_tree'] = true;
         $params['_mainAdmin_tree_pid'] = $parentField;
         $data = $this->listQuerySetting($params, $isScope)->get();
+//        var_dump($params);
         //转换
-        $this->handleTransform($data);
+//        $this->handleTransform($data);
         return $data->toTree([], $data[0]->{$parentField} ?? 0, $id, $parentField, $children);
     }
 
@@ -115,10 +120,30 @@ trait MapperTrait
             $query->select($this->filterQueryAttributes($params['select']));
         }
 
+        if ($params['in']?? false){
+            foreach ($params['in'] as $key => $vals){
+                if (is_numeric($key)){
+                    foreach ($vals as $k => $newVals){
+                        $query->whereIn($k,$newVals);
+                    }
+                }else{
+                    $query->whereIn($key,$vals);
+                }
+            }
+        }
+
+        if ($params['distinct'] ?? false){
+            $query->distinct();
+        }
+
+        if ($params['groupBy']?? false){
+            $query->groupBy($params['groupBy']);
+        }
+
         $query = $this->handleOrder($query, $params);
-
-//        $isScope && $query->userDataScope();
-
+//暂停用户数据权限
+        $isScope && $query->userDataScope(1);//$this->userId > 0?$this->userId:null
+//        var_dump($query->toSql());
         return $this->handleSearch($query, $params);
     }
 
@@ -129,11 +154,6 @@ trait MapperTrait
         //根据数据转换
         $table = $this->getModel()->getTable();
         $systemDictFieldService = nyuwa_app(SystemDictFieldService::class);
-        $ignoreTable = ["system_dict_field","system_dict_type","system_dict_data"];
-//        if (in_array($table,$ignoreTable)){
-//            //不做处理
-//            return $collection;
-//        }
         if (is_array($collection)){
             $collection = NyuwaCollection::make($collection);
         }
@@ -179,14 +199,51 @@ trait MapperTrait
     }
 
     /**
-     * 搜索处理器
+     * 搜索处理器，默认全等字符串查找
      * @param Builder $query
      * @param array $params
      * @return Builder
      */
     public function handleSearch(Builder $query, array $params): Builder
     {
+        //参数里面的基本字段，默认搜索前先剔除业务字段
+        $keys = ['select','_mainAdmin_tree','_mainAdmin_tree_pid',
+            'orderBy','orderType','groupBy','distinct','recycle','is_hidd',"_","page","pageSize"];
+        $model = new $this->model;
+        $attrs = $model->getFillable();
+        foreach ($params as $name => $val) {
+            if (in_array($name, $keys)) {
+                unset($params[$name]);
+            }
+            if (!in_array(trim($name), $attrs)) {
+                unset($params[$name]);
+            }
+        }
+        foreach ($params as $name => $val){
+            $query->where($name,trim($val));
+        }
+
         return $query;
+    }
+
+    /**
+     * 过滤条件字段不存在的属性
+     * @param array $fields
+     * @param bool $removePk
+     * @return array
+     */
+    protected function filterWhereAttributes(array $fields): array
+    {
+        $model = new $this->model;
+        $attrs = $model->getFillable();
+        foreach ($fields as $key => $field) {
+            if (!in_array(trim($field), $attrs)) {
+                $fields[$key] = trim($field);
+            } else {
+                $fields[$key] = trim($field);
+            }
+        }
+        return ( count($fields) < 1 ) ? ['*'] : $fields;
     }
 
     /**
@@ -213,6 +270,7 @@ trait MapperTrait
             unset($fields[array_search($model->getKeyName(), $fields)]);
         }
         $model = null;
+        var_dump($fields);
         return ( count($fields) < 1 ) ? ['*'] : $fields;
     }
 
@@ -247,6 +305,13 @@ trait MapperTrait
         $model = $this->model::query()->create($data);
         return $model->{$model->getKeyName()};
     }
+
+//    public function saveOrUpdate(array $data):string
+//    {
+//        $this->filterExecuteAttributes($data);
+//        $model = $this->model::query()->updateOrCreate($data);
+//        return $model->{$model->getKeyName()};
+//    }
 
     /**
      * 读取一条数据
@@ -324,7 +389,6 @@ trait MapperTrait
         $this->filterExecuteAttributes($data, true);
         $model = $this->model::find($id);
         //按id更新如果data存在id则移除id
-        var_dump($data);
         foreach ($data as $name => $val) {
             $model[$name] = $val;
         }
@@ -401,17 +465,65 @@ trait MapperTrait
         return new $this->model;
     }
 
+
+    /**
+     * 根据表注释生成模板文件。
+     */
+    public function downloadTemplate(){
+        $sql = <<<SQL
+SELECT COLUMN_NAME,column_comment,COLUMN_KEY,ORDINAL_POSITION
+FROM information_schema.COLUMNS
+WHERE table_name = :table order by `ORDINAL_POSITION` ;
+SQL;
+        $table = $this->getModel()->getTable();
+
+        $info = Db::select($sql,['table'=>$table]);
+        //create file
+        $list = [];
+        foreach ($info as $item){
+            $is_pk = 1;
+            if ($item->COLUMN_KEY == "PRI"){
+                $is_pk = 0;
+                //跳过主键
+                continue;
+            }
+            //跳过其他字段
+//            $genColumns = [
+//                "column_name" => $item->COLUMN_NAME,  //字段名称
+//                "column_comment" => $item->COLUMN_COMMENT,  //字段注释
+//            ];
+            $list []= $item->COLUMN_COMMENT;
+        }
+        $config = [
+            'path' => '/home/viest' // xlsx文件保存路径
+        ];
+        $excel  = new \Vtiful\Kernel\Excel($config);
+
+        // fileName 会自动创建一个工作表，你可以自定义该工作表名称，工作表名称为可选参数
+        $filePath = $excel->fileName("{$table}_temple.xlsx", 'sheet1')
+            ->header($list)
+            ->data([
+//                ['Rent', 1000],
+//                ['Gas',  100],
+//                ['Food', 300],
+//                ['Gym',  50],
+            ])
+            ->output();
+    }
+
     /**
      * 数据导入
      * @param string $dto
      * @param \Closure|null $closure
      * @return bool
-     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      * @Transaction
      */
     public function import(string $dto, ?\Closure $closure = null): bool
     {
-        return (new MineCollection())->import($dto, $this->getModel(), $closure);
+        //读取表结构并使用字段
+        $table = $this->getModel()->getTable();
+
+        return (new NyuwaCollection())->import($dto, $this->getModel(), $closure);
     }
 
     /**

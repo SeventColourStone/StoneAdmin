@@ -1,4 +1,0 @@
-
-<script type="text/html" id="{%columnName%}_tpl">
-  <input type="checkbox" name="{%columnName%}" value="{{d.id}}" lay-skin="switch" lay-text="是|否" lay-filter="{%columnName%}_switch" {{ d.{%columnName%} == 0 ? 'checked' : '' }}>
-</script>

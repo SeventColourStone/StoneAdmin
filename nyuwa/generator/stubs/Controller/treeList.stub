@@ -1,0 +1,20 @@
+
+    /**
+     * 获取列表树
+     * @return NyuwaResponse
+     */
+    #[GetMapping("index"), Permission("{INDEX_PERMISSION}")]
+    public function index(Request $request): NyuwaResponse
+    {
+        return $this->success($this->service->getTreeList($request->all()));
+    }
+
+    /**
+     * 前端选择树（不需要权限）
+     * @return NyuwaResponse
+     */
+    #[GetMapping("tree")]
+    public function tree(): NyuwaResponse
+    {
+        return $this->success($this->service->getSelectTree());
+    }

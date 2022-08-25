@@ -1,0 +1,11 @@
+
+    /**
+     * 新增
+     * @return NyuwaResponse
+     */
+    #[PostMapping("save"), Permission("{SAVE_PERMISSION}"), OperationLog]
+    public function save(Request $request): NyuwaResponse
+    {
+        $data = $this->validate->scene("create")->check($request->all());
+        return $this->success(['id' => $this->service->save($request->all())]);
+    }

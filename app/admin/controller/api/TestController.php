@@ -8,20 +8,24 @@ use app\admin\model\system\SystemDictField;
 use app\admin\model\system\SystemMenu;
 use app\admin\model\system\SystemUser;
 use app\admin\service\system\SystemUserService;
+use DI\Annotation\Inject;
 use FastRoute\Route;
 use FastRoute\RouteCollector;
 use Illuminate\Support\Facades\Event;
 use Lcobucci\JWT\Token\Plain;
 use nyuwa\auth\constant\JWTConstant as JWTConstantAlias;
 use nyuwa\event\TestEvent;
+use nyuwa\exception\NyuwaException;
 use nyuwa\helper\LoginUser;
 use nyuwa\NyuwaController;
+use nyuwa\traits\GencodeTrait;
 use support\Container;
 use support\Db;
 use W7\Validate\Exception\ValidateException;
 use W7\Validate\Validate;
 use Webman\Config;
 use Webman\Push\Api;
+use Webman\RedisQueue\Client;
 
 /**
  * Class TestController
@@ -29,30 +33,58 @@ use Webman\Push\Api;
  */
 class TestController extends NyuwaController
 {
+    use GencodeTrait;
+
     /**
-     * @return \nyuwa\NyuwaResponse
+     * @Inject
+     * @var Api
      */
+    private $pusherApi;
+
     public function test(){
-        $table = "system_user";
-//        SystemDictField::query()->where()
-//        $sceneConfig = Config::get(JWTConstantAlias::CONFIG_NAME);
-        $sceneConfig = Config::get("auth.config.scene.application");
-        return $this->success($sceneConfig);
-    }
-
-
-    public function push(){
-        $api = new Api(
-        // webman下可以直接使用config获取配置，非webman环境需要手动写入相应配置
-            config('plugin.webman.push.app.api'),
-            config('plugin.webman.push.app.app_key'),
-            config('plugin.webman.push.app.app_secret')
-        );
 // 给订阅 user-1 的所有客户端推送 message 事件的消息
-        $api->trigger('user-1', 'message', [
+        $bool = $this->pusherApi->trigger('private-user-16128263327904', 'message', [
             'from_uid' => 2,
             'content'  => '你好，这个是消息内容'
         ]);
+        return $this->success("推送成功：".$bool);
+    }
+
+    /**
+     * @return \nyuwa\NyuwaResponse
+     */
+    public function test1(){
+        $table = "system_user";
+//        SystemDictField::query()->where()
+//        $sceneConfig = Config::get(JWTConstantAlias::CONFIG_NAME);
+
+
+        // 队列名
+        $queue = 'test';
+        // 数据，可以直接传数组，无需序列化
+        $data = ['to' => 'tom@gmail.com', 'content' => 'hello'];
+        // 投递消息
+        Client::send($queue, $data);
+        $tableBaseInfo = $this->getTableBaseInfo($table);
+        $tableDetailInfo = $this->getTableDetailInfo($table);
+        if (empty($tableBaseInfo->TABLE_COMMENT)){
+            throw new NyuwaException("生成的curd表需要添加注释");
+        }
+
+        $tableCamelCase = nyuwa_camelize($table);
+        $tableSmallCamelCase = nyuwa_camelize($table,'_',0);
+        $tableUnderScoreCase = nyuwa_uncamelize($table);
+        $tableCenterScoreCase = nyuwa_uncamelize($tableCamelCase,"-");
+        //所有文件生成的基础参数
+        $basicConfigInfo = [
+            "tableComment"=>$tableBaseInfo->TABLE_COMMENT, //表注释
+            "tableUnderScoreCase"=>$tableUnderScoreCase,  // 表名下划线格式
+            "tableCenterScoreCase"=>$tableCenterScoreCase, //表名中划线式，用作前端id名
+            "tableCamelCase"=>$tableCamelCase, //表名大驼峰式
+            "tableSmallCamelCase"=>$tableSmallCamelCase, //表名小驼峰式
+        ];
+        [$tableSearchPhpColString,$tableSearchHtmlColString] = $this->getMapperParamsInfo("system_menu",$tableDetailInfo,$basicConfigInfo);
+        return $this->success([$tableSearchPhpColString,$tableSearchHtmlColString]);
     }
 
 }

@@ -16,8 +16,8 @@
 return [
     // File update detection and automatic reload
     'monitor' => [
-        'handler'     => process\Monitor::class,
-        'reloadable'  => false,
+        'handler' => process\Monitor::class,
+        'reloadable' => false,
         'constructor' => [
             // Monitor these directories
             'monitor_dir' => [
@@ -30,12 +30,8 @@ return [
             ],
             // Files with these suffixes will be monitored
             'monitor_extensions' => [
-                'php', 'html', 'htm', 'env','twig'
+                'php', 'html', 'htm', 'env'
             ]
         ]
-    ],
-//    'api' => [
-//        'handler' => \process\Api::class,
-//        'listen'  => 'http://0.0.0.0:1234',
-//    ]
+    ]
 ];

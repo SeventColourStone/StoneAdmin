@@ -23,8 +23,8 @@ class OperationListener
      */
     public function handle(TestEvent $event)
     {
-        Log::info("TestListener事件触发了");
-        var_dump("TestListener事件触发了");
+//        Log::info("TestListener事件触发了");
+//        var_dump("TestListener事件触发了");
         // 使用 $event->order 来访问订单 ...
     }
 }

@@ -1,12 +1,18 @@
 <?php
 
+declare(strict_types=1);
 
 namespace app\admin\model\system;
 
+
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use nyuwa\NyuwaModel;
-
 /**
+ * 上传文件信息表
+ * Class SystemUploadfile
+ * @package app\admin\model\core
+ *
  * @property int $id 主键
  * @property string $storage_mode 状态 (1 本地 2 阿里云 3 七牛云 4 腾讯云)
  * @property string $origin_name 原文件名
@@ -39,12 +45,19 @@ class SystemUploadfile extends NyuwaModel
      *
      * @var array
      */
-    protected $fillable = ['id', 'storage_mode', 'origin_name', 'object_name', 'mime_type', 'storage_path', 'suffix', 'size_byte', 'size_info', 'url', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark'];
+    protected $fillable = ['storage_mode','origin_name','object_name','mime_type','storage_path','suffix','size_byte','size_info','url','created_by','updated_by','created_at','updated_at','deleted_at','remark',];
+
+
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = ['id' => 'string', 'size_byte' => 'integer', 'created_by' => 'string', 'updated_by' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected $casts = ['id' => 'string', 'created_by' => 'string', 'updated_by' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+
+    /* 一些关联表的关联操作 */
+
+
 
 }

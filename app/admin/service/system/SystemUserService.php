@@ -1,22 +1,32 @@
 <?php
 
+declare(strict_types=1);
 
 namespace app\admin\service\system;
 
 
 use app\admin\mapper\system\SystemUserMapper;
 use app\admin\model\system\SystemUser;
+use app\admin\service\setting\SettingConfigService;
 use DI\Annotation\Inject;
 use Gregwar\Captcha\CaptchaBuilder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use nyuwa\abstracts\AbstractService;
 use nyuwa\event\UserLoginAfter;
 use nyuwa\event\UserLoginBefore;
+use nyuwa\exception\CaptchaException;
 use nyuwa\exception\NormalStatusException;
+use nyuwa\exception\NyuwaException;
+use nyuwa\exception\UserBanException;
 use nyuwa\helper\NyuwaCode;
+use nyuwa\NyuwaEvent;
+use nyuwa\vo\UserServiceVo;
 use Psr\Cache\InvalidArgumentException;
 use support\Cache;
+use support\Log;
 use support\Redis;
 use Webman\App;
+use Webman\Event\Event;
 
 class SystemUserService extends AbstractService
 {
@@ -39,6 +49,11 @@ class SystemUserService extends AbstractService
      */
     protected $sysRoleService;
 
+    /**
+     * @Inject
+     * @var SettingConfigService
+     */
+    protected $settingConfigService;
 
     /**
      * 获取验证码
@@ -58,9 +73,9 @@ class SystemUserService extends AbstractService
         return $builder->get();
     }
 
-
     /**
      * 检查用户提交的验证码
+     * @throws \Exception
      */
     public function checkCaptcha(string $code)
     {
@@ -76,49 +91,71 @@ class SystemUserService extends AbstractService
 
     /**
      * 用户登陆
-     * @param array $data
+     * @param UserServiceVo $data
      */
-    public function login(array $data)
+    public function login(UserServiceVo $userServiceVo)
     {
-        nyuwa_event(new UserLoginBefore($data));
-        $userinfo = $this->mapper->checkUserByUsername($data['username']);
-        $userLoginAfter = new UserLoginAfter($userinfo);
-        if ($data['code'] == "abcd"){
+        try {
+            nyuwa_event(new UserLoginBefore(['username' => $userServiceVo->getUsername(), 'password' => $userServiceVo->getPassword()]));
+            $userinfo = $this->mapper->checkUserByUsername($userServiceVo->getUsername())->toArray();
+            $password = $userinfo['password'];
+            unset($userinfo['password']);
+            $userLoginAfter = new UserLoginAfter($userinfo);
+            $webLoginVerify = $this->settingConfigService->getConfigByKey('web_login_verify');
+            if (isset($webLoginVerify['value']) && $webLoginVerify['value'] === '1') {
+                if ($userServiceVo->getVerifyCode() == "abcd"){
+                    //临时放行
 
-        }else
-        if (!$this->checkCaptcha($data['code'])) {
-            //事件日志记录
-            $userLoginAfter->message = nyuwa_trans('jwt.code_error');
-            $userLoginAfter->loginStatus = false;
-            nyuwa_event($userLoginAfter);
-            //throw new CaptchaException(nyuwa_trans('jwt.code_error'));
-            throw new NormalStatusException(nyuwa_trans('jwt.code_error'));
-        }
-        if ($this->mapper->checkPass($data['password'], $userinfo['password'])) {
-            if (
-                ($userinfo['status'] == SystemUser::USER_NORMAL)
-                ||
-                ($userinfo['status'] == SystemUser::USER_BAN && $userinfo['id'] == env('SUPER_ADMIN'))
-            ) {
-                $userLoginAfter->message = nyuwa_trans('jwt.login_success');
-                $token = nyuwa_user()->createToken($userLoginAfter->userinfo);
-                $userLoginAfter->token = $token;
-                nyuwa_event($userLoginAfter);
-                return $token;
+                }else
+                if (! $this->checkCaptcha($userServiceVo->getVerifyCode())) {
+                    $userLoginAfter->message = nyuwa_trans('jwt.code_error');
+                    $userLoginAfter->loginStatus = false;
+                    Event::emit(NyuwaEvent::USER_LOGIN_AFTER,$userLoginAfter);
+                    throw new CaptchaException;
+                }
+            }
+            if ($this->mapper->checkPass($userServiceVo->getPassword(), $password)) {
+                if (
+                    ($userinfo['status'] == SystemUser::USER_NORMAL)
+                    ||
+                    ($userinfo['status'] == SystemUser::USER_BAN && $userinfo['id'] == env('SUPER_ADMIN'))
+                ) {
+                    $userLoginAfter->message = nyuwa_trans('jwt.login_success');
+                    $token = nyuwa_user()->createToken($userLoginAfter->userinfo);
+                    $userLoginAfter->token = $token;
+                    Event::emit(NyuwaEvent::USER_LOGIN_AFTER,$userLoginAfter);
+                    return $token;
+                } else {
+                    $userLoginAfter->loginStatus = false;
+                    $userLoginAfter->message = nyuwa_trans('jwt.user_ban');
+                    Event::emit(NyuwaEvent::USER_LOGIN_AFTER,$userLoginAfter);
+                    throw new UserBanException;
+                }
             } else {
                 $userLoginAfter->loginStatus = false;
-                $userLoginAfter->message = nyuwa_trans('jwt.user_ban');
-                nyuwa_event($userLoginAfter);
-                // throw new UserBanException;
+                $userLoginAfter->message = nyuwa_trans('jwt.password_error');
+                Event::emit(NyuwaEvent::USER_LOGIN_AFTER,$userLoginAfter);
+                throw new NormalStatusException;
+            }
+
+        } catch (\Exception $e) {
+            if ($e instanceof ModelNotFoundException) {
+                throw new NormalStatusException(nyuwa_trans('jwt.username_error'), NyuwaCode::NO_DATA);
+            }
+            if ($e instanceof NormalStatusException) {
+                throw new NormalStatusException(nyuwa_trans('jwt.password_error'), NyuwaCode::PASSWORD_ERROR);
+            }
+            if ($e instanceof UserBanException) {
                 throw new NormalStatusException(nyuwa_trans('jwt.user_ban'), NyuwaCode::USER_BAN);
             }
-        } else {
-            $userLoginAfter->loginStatus = false;
-            $userLoginAfter->message = nyuwa_trans('jwt.password_error');
-            nyuwa_event($userLoginAfter);
-            throw new NormalStatusException(nyuwa_trans('jwt.password_error'), NyuwaCode::PASSWORD_ERROR);
+            if ($e instanceof CaptchaException) {
+                throw new NormalStatusException(nyuwa_trans('jwt.code_error'));
+            }
+            throw new NormalStatusException(nyuwa_trans('jwt.unknown_error'));
         }
+
     }
+
 
 
     /**
@@ -135,14 +172,42 @@ class SystemUserService extends AbstractService
         }
     }
 
+    public function update(string $id, array $data): bool
+    {
+        if (isset($data['username'])) unset($data['username']);
+        if (isset($data['password'])) unset($data['password']);
+        return $this->mapper->update($id, $this->handleData($data));
+    }
+
+    /**
+     * 处理提交数据
+     * @param $data
+     * @return array
+     */
+    protected function handleData($data): array
+    {
+        if (!is_array($data['role_ids'])) {
+            $data['role_ids'] = explode(',', $data['role_ids']);
+        }
+        if (($key = array_search(env('ADMIN_ROLE'), $data['role_ids'])) !== false) {
+            unset($data['role_ids'][$key]);
+        }
+        if (!empty($data['post_ids']) && !is_array($data['post_ids'])) {
+            $data['post_ids'] = explode(',', $data['post_ids']);
+        }
+        if (is_array($data['dept_id'])) {
+            $data['dept_id'] = array_pop($data['dept_id']);
+        }
+        return $data;
+    }
+
     /**
      * 用户退出
-     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function logout()
     {
         $user = nyuwa_user();
-        $user->getJwt()->logout();
+        $user->getJwt()->invalidToken();
     }
 
     /**
@@ -151,24 +216,35 @@ class SystemUserService extends AbstractService
      */
     public function getInfo(): array
     {
-        $userId = (int)nyuwa_user()->getId();
-        $key = "loginInfo_userId_".$userId;
-        $val = Cache::get($key);
-        if (!$val){
-            $val = $this->getDbInfo(SystemUser::find($userId));
-            Cache::set($key,$val);
+//        $userId = (int)nyuwa_user()->getId();
+//        $key = "loginInfo_userId_".$userId;
+//        $val = Cache::get($key);
+//        if (!$val){
+//            $val = $this->getUserInfo(SystemUser::find($userId));
+//            Cache::set($key,$val);
+//        }
+//        return $val;
+
+        if ( ($uid = nyuwa_user()->getId()) ) {
+            $key = "LOGIN_INFO_USER_ID_".$uid;
+            $val = Cache::get($key);
+            if (!$val){
+                $val = $this->getUserInfo((int)$uid);
+                Cache::set($key,$val);
+            }
+            return $val;
         }
-        return $val;
+        throw new NyuwaException(nyuwa_trans('system.unable_get_userinfo'), 500);
     }
 
     /**
      * 获取缓存用户信息
-     * @Cacheable(prefix="loginInfo", ttl=0, value="userId_#{user.id}")
-     * @param SystemUser $user
+     * @param int $id
      * @return array
      */
-    protected function getDbInfo(SystemUser $user): array
+    protected function getUserInfo(int $id): array
     {
+        $user = $this->mapper->getModel()->find($id);
         $user->setHidden(['deleted_at', 'password']);
         $data['user'] = $user->toArray();
         if (nyuwa_user()->isSuperAdmin()) {
@@ -203,17 +279,15 @@ class SystemUserService extends AbstractService
         return array_unique($ids);
     }
 
+
     /**
      * 清除用户缓存
      * @param string $id
      * @return bool
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function clearCache(string $id): bool
     {
-        $prefix = config('cache.default.prefix');
-        return Redis::del("{$prefix}loginInfo:userId_{$id}") > 0;
+        return Redis::del("LOGIN_INFO_USER_ID_{$id}") > 0;
     }
 
     /**
@@ -246,8 +320,6 @@ class SystemUserService extends AbstractService
      * 用户更新个人资料
      * @param array $params
      * @return bool
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function updateInfo(array $params): bool
     {
@@ -272,37 +344,20 @@ class SystemUserService extends AbstractService
      */
     public function modifyPassword(array $params): bool
     {
+        //判断旧密码是否正确
+        $oldPassword = $params['oldPassword'];
+        $model = $this->mapper->getModel()::find((int) nyuwa_user()->getId(), ['password']);
+        if (! $this->mapper->checkPass($oldPassword, $model->password)) {
+            return false;
+        }
         return $this->mapper->initUserPassword((int)nyuwa_user()->getId(), $params['newPassword']);
     }
 
-    /**
-     * 处理提交数据
-     * @param $data
-     * @return array
-     */
-    protected function handleData($data): array
-    {
-        if (!is_array($data['role_ids'])) {
-            $data['role_ids'] = explode(',', $data['role_ids']);
-        }
-        if (($key = array_search(env('ADMIN_ROLE'), $data['role_ids'])) !== false) {
-            unset($data['role_ids'][$key]);
-        }
-        if (!empty($data['post_ids']) && !is_array($data['post_ids'])) {
-            $data['post_ids'] = explode(',', $data['post_ids']);
-        }
-        if (is_array($data['dept_id'])) {
-            $data['dept_id'] = array_pop($data['dept_id']);
-        }
-        return $data;
-    }
 
     /**
      * 获取在线用户
      * @param array $params
      * @return array
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function getOnlineUserPageList(array $params = []): array
     {
@@ -332,9 +387,6 @@ class SystemUserService extends AbstractService
      * 强制下线用户
      * @param string $id
      * @return bool
-     * @throws InvalidArgumentException
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function kickUser(string $id): bool
     {

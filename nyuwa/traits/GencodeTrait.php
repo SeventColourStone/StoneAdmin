@@ -34,7 +34,7 @@ trait GencodeTrait
         $arr = explode('/', $module);
         $arr = array_filter($arr);//去掉空值,得到可靠的模块名
         $modulePath = implode(DS,$arr);
-        var_dump($modulePath);
+//        var_dump($modulePath);
 //        if ($app == "")
 //            $app = "admin";
 
@@ -366,7 +366,7 @@ SQL;
         if (count($info) == 1){
             return $info[0];
         }
-        throw new NyuwaException("没有查找到表");
+        throw new NyuwaException("没有查找到表:".$table);
     }
 
     public function getAllTable(){
@@ -572,87 +572,91 @@ SQL;
         /**
          * 获取mapper参数
          */
-//        [$tableFillableFields] = $this->getMapperParamsInfo($table,$tableDetailInfo,$BasicConfigInfo);
-        $this->writeInFile("service/mapper",$serviceBasicConfig,$appMapperPath.DS .$appMapperFileName);
+        [$tableSearchPhpColString,$tableSearchHtmlColString] = $this->getMapperParamsInfo($table,$tableDetailInfo,$basicConfigInfo);
+        $this->writeInFile("service/mapper",array_merge($serviceBasicConfig,["tableSearchPhpColString"=>$tableSearchPhpColString]),$appMapperPath.DS .$appMapperFileName);
         $this->writeInFile("service/model",array_merge($serviceBasicConfig,["tableFillableFields"=>$tableFillableFields]),$appModelPath.DS .$appModelFileName);
 
 
+        $genUi = false;
+        if ($genUi){
 
-        //自动根据字段注入一些基础的转换字段，如status自动注入
-        $systemDictFieldService = nyuwa_app(SystemDictFieldService::class);
-        $systemDictTypeService = nyuwa_app(SystemDictTypeService::class);
+            //自动根据字段注入一些基础的转换字段，如status自动注入
+            $systemDictFieldService = nyuwa_app(SystemDictFieldService::class);
+            $systemDictTypeService = nyuwa_app(SystemDictTypeService::class);
 
-        $systemDictTypes = $systemDictTypeService->getList(["codes"=>$relationDictFields,"select"=>"id,code"]);
-        var_dump($systemDictTypes);
-        //要入库的字典信息
-        $newDictFieldArr = [];
-        foreach ($systemDictTypes as $dictTypeItem){
-            $newDictFieldArr []= [
-                "dict_type_id" => $dictTypeItem['id'],
-                "table_name" => $table,
-                "field_name" => $dictTypeItem['code'],
-                "default_val" => "未知",
-                "view_type" => "radio_xmselect",
-            ];
+            $systemDictTypes = $systemDictTypeService->getList(["codes"=>$relationDictFields,"select"=>"id,code"]);
+            var_dump($systemDictTypes);
+            //要入库的字典信息
+            $newDictFieldArr = [];
+            foreach ($systemDictTypes as $dictTypeItem){
+                $newDictFieldArr []= [
+                    "dict_type_id" => $dictTypeItem['id'],
+                    "table_name" => $table,
+                    "field_name" => $dictTypeItem['code'],
+                    "default_val" => "未知",
+                    "view_type" => "radio_xmselect",
+                ];
+            }
+            var_dump($newDictFieldArr);
+            try {
+                $i = $systemDictFieldService->batchSave($newDictFieldArr);
+                var_dump($i);
+            }catch (\Exception $e){
+
+            }
+
+
+    //        [$uiTableColsString,$tableUiComponent,$uiFormEditHtmlString,$uiFormJsString,$uiEditFormString,$uiFormAddHtmlString,$xmSelectSetValuesString] = $this->getUiParamsInfo($table,$tableDetailInfo,$basicConfigInfo);
+
+
+            $systemDictFieldService = nyuwa_app(SystemDictFieldService::class);
+    //        $dictFields = $systemDictFieldService->getTableField($table);//从缓存获取
+            //不适用缓存
+            $dictFields = $systemDictFieldService->mapper->getDictFieldArrayByTable($table);;
+
+            [$uiTableColsString,$tableUiComponent,$tableUiComponentJS] = $this->getUiIndexParamsInfo($table,$tableDetailInfo,$basicConfigInfo,$dictFields);
+            [$uiFormAddHtmlString,$uiFormAddJsString] = $this->getUiAddParamsInfo($table,$tableDetailInfo,$basicConfigInfo,$dictFields);
+            [$uiFormEditHtmlString,$uiFormEditJsString,$uiFormEditSetValueString,$xmSelectSetValuesString] = $this->getUiEditParamsInfo($table,$tableDetailInfo,$basicConfigInfo,$dictFields);
+
+
+            //前端控制器基础变量配置
+            $uiServiceBasicConfigInfo = array_merge($basicConfigInfo,[
+                "controllerNamespace"=>$appUiControllerNamespace,
+                "serviceNamespace"=>$appServiceNamespace,
+                "validateNamespace"=>$appValidateNamespace,
+                "mapperNamespace"=>$appMapperNamespace,
+                "modelNamespace"=>$appModelNamespace,
+                "appUiViewBasePath"=>$appUiViewBasePath,
+            ]);
+
+            //默认adminUi应用作为基础的前端渲染ui，后续考虑多个前端ui
+            $this->writeInFile("service/uiController",$uiServiceBasicConfigInfo,$appUiControllerPath.DS .$appUiControllerFileName);
+
+
+            //生成前端代码
+            $this->writeInFile("ui/index",array_merge($basicConfigInfo,[
+                "apiUrlPath" => $apiUrlPath,
+                "uiUrlPath" => $uiUrlPath,
+                "uiTableColsString" =>$uiTableColsString,
+                "tableUiComponent" =>$tableUiComponent,
+                "tableUiComponentJS" =>$tableUiComponentJS,
+                "tableSearchHtmlColString" =>$tableSearchHtmlColString,
+            ]),$appUiIndexViewPath.DS .$appUiIndexViewFileName);
+            $this->writeInFile("ui/add",array_merge($basicConfigInfo,[
+                "apiUrlPath" => $apiUrlPath,
+                "uiUrlPath" => $uiUrlPath,
+                "uiFormAddHtmlString" => $uiFormAddHtmlString,
+                "uiFormAddJsString" => $uiFormAddJsString
+            ]),$appUiAddViewPath.DS .$appUiAddViewFileName);
+            $this->writeInFile("ui/edit",array_merge($basicConfigInfo,[
+                "apiUrlPath" => $apiUrlPath,
+                "uiUrlPath" => $uiUrlPath,
+                "uiFormEditHtmlString" => $uiFormEditHtmlString,
+                "uiFormEditJsString" => $uiFormEditJsString,
+                "uiFormEditSetValueString" => $uiFormEditSetValueString,
+                "xmSelectSetValuesString" => $xmSelectSetValuesString
+            ]),$appUiEditViewPath.DS .$appUiEditViewFileName);
         }
-        var_dump($newDictFieldArr);
-        try {
-            $i = $systemDictFieldService->batchSave($newDictFieldArr);
-            var_dump($i);
-        }catch (\Exception $e){
-
-        }
-
-
-//        [$uiTableColsString,$tableUiComponent,$uiFormEditHtmlString,$uiFormJsString,$uiEditFormString,$uiFormAddHtmlString,$xmSelectSetValuesString] = $this->getUiParamsInfo($table,$tableDetailInfo,$basicConfigInfo);
-
-
-        $systemDictFieldService = nyuwa_app(SystemDictFieldService::class);
-//        $dictFields = $systemDictFieldService->getTableField($table);//从缓存获取
-        //不适用缓存
-        $dictFields = $systemDictFieldService->mapper->getDictFieldArrayByTable($table);;
-
-        [$uiTableColsString,$tableUiComponent,$tableUiComponentJS] = $this->getUiIndexParamsInfo($table,$tableDetailInfo,$basicConfigInfo,$dictFields);
-        [$uiFormAddHtmlString,$uiFormAddJsString] = $this->getUiAddParamsInfo($table,$tableDetailInfo,$basicConfigInfo,$dictFields);
-        [$uiFormEditHtmlString,$uiFormEditJsString,$uiFormEditSetValueString,$xmSelectSetValuesString] = $this->getUiEditParamsInfo($table,$tableDetailInfo,$basicConfigInfo,$dictFields);
-
-
-        //前端控制器基础变量配置
-        $uiServiceBasicConfigInfo = array_merge($basicConfigInfo,[
-            "controllerNamespace"=>$appUiControllerNamespace,
-            "serviceNamespace"=>$appServiceNamespace,
-            "validateNamespace"=>$appValidateNamespace,
-            "mapperNamespace"=>$appMapperNamespace,
-            "modelNamespace"=>$appModelNamespace,
-            "appUiViewBasePath"=>$appUiViewBasePath,
-        ]);
-
-        //默认adminUi应用作为基础的前端渲染ui，后续考虑多个前端ui
-        $this->writeInFile("service/uiController",$uiServiceBasicConfigInfo,$appUiControllerPath.DS .$appUiControllerFileName);
-
-
-        //生成前端代码
-        $this->writeInFile("ui/index",array_merge($basicConfigInfo,[
-            "apiUrlPath" => $apiUrlPath,
-            "uiUrlPath" => $uiUrlPath,
-            "uiTableColsString" =>$uiTableColsString,
-            "tableUiComponent" =>$tableUiComponent,
-            "tableUiComponentJS" =>$tableUiComponentJS,
-        ]),$appUiIndexViewPath.DS .$appUiIndexViewFileName);
-        $this->writeInFile("ui/add",array_merge($basicConfigInfo,[
-            "apiUrlPath" => $apiUrlPath,
-            "uiUrlPath" => $uiUrlPath,
-            "uiFormAddHtmlString" => $uiFormAddHtmlString,
-            "uiFormAddJsString" => $uiFormAddJsString
-        ]),$appUiAddViewPath.DS .$appUiAddViewFileName);
-        $this->writeInFile("ui/edit",array_merge($basicConfigInfo,[
-            "apiUrlPath" => $apiUrlPath,
-            "uiUrlPath" => $uiUrlPath,
-            "uiFormEditHtmlString" => $uiFormEditHtmlString,
-            "uiFormEditJsString" => $uiFormEditJsString,
-            "uiFormEditSetValueString" => $uiFormEditSetValueString,
-            "xmSelectSetValuesString" => $xmSelectSetValuesString
-        ]),$appUiEditViewPath.DS .$appUiEditViewFileName);
 
         //创建完毕
         var_dump("创建完毕");
@@ -679,7 +683,7 @@ SQL;
             ["path"=>"edit","name"=>"编辑","is_hidden"=>0],
         ];
 
-        $menuUiIdx = ["path"=>"index","name"=>"列表","is_hidden"=>1];
+        $menuUiIdx = ["path"=>"index","name"=>"","is_hidden"=>1];
         $uiUrl = $uiUrlPath."/".$menuUiIdx['path'];
         $code = str_replace("/",":",trim($uiUrl,"/"));
         $name = $menuName.$menuUiIdx['name'];
@@ -854,20 +858,34 @@ SQL;
      */
     private function getMapperParamsInfo($table, $tableDetailInfo, $BasicConfigInfo)
     {
-        $tableSearchFields = [];
-        foreach ($tableDetailInfo as $key => $item){
+        $tableSearchPhpFields = [];
+        $tableSearchHtmlFields = [];
+        //获取表存在的索引，根据索引设置查询
+        $info = Db::select("SELECT * FROM information_schema.STATISTICS WHERE table_name = :table ;",['table'=>$table]);
+
+        foreach ($info as $key => $item){
             $columnName = $item->COLUMN_NAME;
-            $columnComment = $item->COLUMN_COMMENT;
-            $dataType = $item->DATA_TYPE;
-            $characterMaximumLength = $item->CHARACTER_MAXIMUM_LENGTH;
-            $isNullable = $item->IS_NULLABLE;
             if ($columnName == "id"){
                 continue;
             }
-            $tableSearchFields .= "'{$columnName}',";
+            $sql = <<<SQL
+SELECT COLUMN_NAME,COLUMN_KEY,ORDINAL_POSITION
+	, column_type, IS_NULLABLE, CHARACTER_MAXIMUM_LENGTH, data_type,COLUMN_COMMENT
+FROM information_schema.COLUMNS
+WHERE table_name = :table and COLUMN_NAME = :COLUMN_NAME order by `ORDINAL_POSITION` ;
+SQL;
+            $columnInfo = Db::select($sql,['table'=>$table,"COLUMN_NAME"=>$columnName]);
+            var_dump($columnInfo);
+            $columnComment = $columnInfo[0]->COLUMN_COMMENT;
+            $php = $this->getReplacedStub("mixins/handleSearch-php",["columnComment"=>$columnComment,"columnName"=>$columnName]);
+            $html = $this->getReplacedStub("mixins/handleSearch-Tpl",["columnComment"=>$columnComment,"columnName"=>$columnName]);
+            $tableSearchPhpFields []= $php;
+            $tableSearchHtmlFields []= $html;
 
         }
-        return [$tableSearchFields];
+        $tableSearchPhpColString = implode(PHP_EOL,$tableSearchPhpFields);
+        $tableSearchHtmlColString = implode(PHP_EOL,$tableSearchHtmlFields);
+        return [$tableSearchPhpColString,$tableSearchHtmlColString];
     }
 
     /**
@@ -898,8 +916,7 @@ SQL;
             if (!in_array($columnName, $this->ignoreTableFields)) {
                 if (in_array($columnName, $dictFields)) {
                     if ("status" == $columnName){
-                        var_dump("包含status字段");
-                        //以is开头的字段直接生成switch
+                        var_dump("status字段");
                         $str = "{title: '$columnComment',field: '$columnName', templet: '#{$columnName}_tpl', unresize: true}";
                         $html = $this->getReplacedStub("mixins/tableSwitchTpl",["columnComment"=>$columnComment,"columnName"=>$columnName]);
                         $js = $this->getReplacedStub("mixins/tableSwitchJs",["columnComment"=>$columnComment,"columnName"=>$columnName]);

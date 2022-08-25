@@ -12,4 +12,10 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-return [];
+return [
+
+    \Webman\Push\Api::class =>  new \Webman\Push\Api(
+        str_replace('0.0.0.0', '127.0.0.1', config('plugin.webman.push.app.api')),
+        config('plugin.webman.push.app.app_key'),
+        config('plugin.webman.push.app.app_secret'))
+];

@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
 
-declare (strict_types=1);
 namespace app\admin\model\system;
 
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use nyuwa\NyuwaModel;
-
-
 /**
+ * 用户表
+ * Class SystemUser
+ * @package app\admin\model\core
+ *
  * @property int $id 用户ID，主键
  * @property string $username 用户名
  * @property string $user_type 用户类型：(100系统用户)
@@ -38,9 +40,14 @@ use nyuwa\NyuwaModel;
  */
 class SystemUser extends NyuwaModel
 {
+
     use SoftDeletes;
     public const USER_NORMAL = 0;
     public const USER_BAN = 1;
+    /**
+     * 系统用户
+     */
+    public const TYPE_SYS_USER = '100';
     public $incrementing = false;
     /**
      * The table associated with the model.
@@ -104,31 +111,4 @@ class SystemUser extends NyuwaModel
     {
         return password_verify($password, $hash);
     }
-
-    //追加字段
-//    protected $appends = ['user_type_name'];
-
-    //赋值
-//    public function getUserTypeNameAttribute()
-//    {
-//        $userType = $this->attributes['user_type'];
-//
-//        $dictFieldModel = SystemDictField::query()->where([['table_name',"=",$this->table],["field_name","=","user_type"]])->first();
-//        var_dump(json_encode($dictFieldModel));
-//        $dict_type_id = $dictFieldModel['dict_type_id'];
-//        $dictTypeinfo = SystemDictType::query()->find($dict_type_id);
-////        $dictType = $dictFieldModel->dictType();
-////        $dictData = $dictTypeinfo->dictData();
-//        $dictData = SystemDictData::query()->where("type_id",$dictTypeinfo['id'])->get();
-////        var_dump(json_encode($dictType));
-//        var_dump(json_encode($dictTypeinfo));
-//        var_dump(json_encode($dictData));
-//        if ($userType == 100) {
-//            return '系统用户';
-//        } elseif ($userType == 101) {
-//            return '普通用户';
-//        } else {
-//            return '未知';
-//        }
-//    }
 }

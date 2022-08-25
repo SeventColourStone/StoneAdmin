@@ -10,11 +10,21 @@ use nyuwa\event\ModelSavedEvent;
 use nyuwa\helper\LoginUser;
 use nyuwa\traits\ModelCacheTrait;
 use nyuwa\traits\ModelMacroTrait;
+use support\Container;
 use support\Model;
+use Webman\App;
 
 class NyuwaModel extends Model
 {
     use ModelMacroTrait;
+
+    /**
+     * 模型的日期字段的存储格式
+     *
+     * @var string
+     */
+    protected $dateFormat = 'Y-m-d H:i:s';
+
 
     /**
      * 模型的 "booted" 方法
@@ -43,6 +53,17 @@ class NyuwaModel extends Model
                     $modelInstant->updated_by = $loginUser->getId();
                 }
             } catch (\Throwable $e) {
+                // 设置创建人
+                if ($modelInstant instanceof NyuwaModel &&
+                    in_array('created_by', $modelInstant->getFillable()) &&
+                    is_null($modelInstant->created_by)
+                ) {
+                    $modelInstant->created_by = 1;
+                }
+                // 设置更新人
+                if ($modelInstant instanceof NyuwaModel && in_array('updated_by', $modelInstant->getFillable())) {
+                    $modelInstant->updated_by = 1;
+                }
             }
 
             // 生成ID
@@ -51,9 +72,8 @@ class NyuwaModel extends Model
                 $modelInstant->getPrimaryKeyType() === 'int' &&
                 empty($modelInstant->{$modelInstant->getKeyName()})
             ) {
-                //整形主键使用snowflake
-                $snowflake = nyuwa_app(Snowflake::class);
-                $modelInstant->setPrimaryKeyValue($snowflake->id());
+                //整形未设置自增主键使用snowflake
+                $modelInstant->setPrimaryKeyValue(snowflake_id());
             }
         });
     }

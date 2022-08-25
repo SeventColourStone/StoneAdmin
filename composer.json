@@ -25,40 +25,48 @@
   },
   "require": {
     "php": ">=7.2",
-    "workerman/webman-framework": "^1.3.0",
+    "workerman/webman-framework": "^1.3.14",
     "monolog/monolog": "^2.0",
-    "php-di/php-di": "^6.3",
+    "psr/container": "1.1.1",
+    "illuminate/database": "^9.17",
+    "illuminate/pagination": "^9.16",
+    "illuminate/events": "^9.17",
+    "illuminate/redis": "^9.17",
+    "symfony/var-dumper": "^6.0",
+    "symfony/translation": "^6.0",
+    "symfony/finder": "^6.0",
+    "symfony/cache": "^6.0",
     "doctrine/annotations": "^1.13",
     "webman/push": "^1.0",
     "robmorgan/phinx": "^0.12.10",
     "webman/console": "^1.0.16",
-    "symfony/translation": "^6.0",
     "lcobucci/jwt": "^4.1",
     "gregwar/captcha": "1.*",
-    "symfony/cache": "^6.0",
-    "workerman/validation": "^3.0",
-    "illuminate/events": "^8.0",
-    "illuminate/redis": "^8.0",
-    "illuminate/database": "^8.0",
-    "illuminate/pagination": "^8.0",
-    "zircote/swagger-php": "^4.2",
     "w7/engine-validate": "^4.1",
-    "yzh52521/webman-aop": "^1.0",
     "vlucas/phpdotenv": "^5.4",
     "godruoyi/php-snowflake": "^2.0",
-    "marc-mabe/php-enum": "^4.6",
-    "mtdowling/jmespath.php": "^2.6",
-    "viest/php-ext-xlswriter-ide-helper": "dev-master"
+    "webman/redis-queue": "^1.1",
+    "workerman/crontab": "^1.0",
+    "guzzlehttp/guzzle": "^7.4",
+    "phpoffice/phpspreadsheet": "^1.18",
+    "php-di/php-di": "^6.4",
+    "zircote/swagger-php": "^4.4",
+    "shopwwi/webman-filesystem": "^1.0",
+    "nyuwa/phinx-migrations-generator": "dev-master",
+    "webman/event": "^1.0",
+    "zoujingli/ip2region": "^1.0",
+    "linfo/linfo": "^4.0",
+    "workbunny/webman-nacos": "^1.0"
   },
   "suggest": {
     "ext-event": "For better performance. "
   },
   "autoload": {
     "psr-4": {
-      "Nyuwa\\Auth\\" : "vendor/nyuwa/auth/src",
-      "Nyuwa\\Aop\\" : "vendor/nyuwa/aop/src",
-      "Nyuwa\\Jwt\\" : "vendor/nyuwa/jwt/src",
-      "" : "./"
+      "Stone\\Im\\" : "vendor/stone/im/src",
+      "Stone\\Bbs\\" : "vendor/stone/bbs/src",
+      "": "./",
+      "App\\": "./app"
     },
     "files": [
       "./support/helpers.php",
@@ -69,11 +77,11 @@
     "post-package-install": [
       "support\\Plugin::install"
     ],
+    "post-package-update": [
+      "support\\Plugin::install"
+    ],
     "pre-package-uninstall": [
       "support\\Plugin::uninstall"
     ]
-  },
-  "require-dev": {
-    "phpunit/phpunit": "^9.5"
   }
 }

@@ -26,8 +26,6 @@ class TestAspect extends AbstractAspect
      * @param ProceedingJoinPointInterface $joinPoint
      * @return mixed
      * @throws Exception
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function process(ProceedingJoinPointInterface $joinPoint)
     {

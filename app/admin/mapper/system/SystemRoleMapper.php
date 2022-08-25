@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace app\admin\mapper\system;
 
@@ -8,6 +9,11 @@ use app\admin\model\system\SystemRole;
 use Illuminate\Database\Eloquent\Builder;
 use nyuwa\abstracts\AbstractMapper;
 
+/**
+ * 角色表
+ * Class SystemRoleMapper
+ * @package app\admin\mapper\core
+ */
 class SystemRoleMapper extends AbstractMapper
 {
     /**
@@ -19,6 +25,7 @@ class SystemRoleMapper extends AbstractMapper
     {
         $this->model = SystemRole::class;
     }
+
 
     /**
      * 通过角色ID列表获取菜单ID
@@ -86,7 +93,6 @@ class SystemRoleMapper extends AbstractMapper
      */
     public function update(string $id, array $data): bool
     {
-        var_dump($data);
         $menuIds = $data['menu_ids'] ?? [];
         $deptIds = $data['dept_ids'] ?? [];
         $this->filterExecuteAttributes($data, true);

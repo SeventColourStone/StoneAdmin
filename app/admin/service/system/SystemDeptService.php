@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace app\admin\service\system;
 
@@ -20,12 +21,13 @@ class SystemDeptService extends AbstractService
 
     /**
      * @param array|null $params
+     * @param bool $isScope
      * @return array
      */
-    public function getTreeList(?array $params = null): array
+    public function getTreeList(?array $params = null, bool $isScope = true): array
     {
         $params = array_merge(['orderBy' => 'sort', 'orderType' => 'desc'], $params);
-        return parent::getTreeList($params);
+        return parent::getTreeList($params, $isScope);
     }
 
     /**
@@ -40,7 +42,7 @@ class SystemDeptService extends AbstractService
     /**
      * 新增部门
      * @param array $data
-     * @return string
+     * @return int
      */
     public function save(array $data): string
     {
@@ -77,8 +79,8 @@ class SystemDeptService extends AbstractService
             $data['level'] = $this->read($data['id'])->level . ',' . $data['parent_id'];
         }
 
-        if (isset($data['id']) && $data['id'] == $data['parent_id']) {
-            throw new NormalStatusException(nyuwa_trans('system.parent_dept_error'), 500);
+        if ($data['id'] == $data['parent_id']) {
+            throw new NormalStatusException(trans('system.parent_dept_error'), 500);
         }
 
         return $data;
@@ -87,7 +89,7 @@ class SystemDeptService extends AbstractService
     /**
      * 真实删除部门
      * @param string $ids
-     * @return array
+     * @return array|null
      */
     public function realDel(string $ids): ?array
     {

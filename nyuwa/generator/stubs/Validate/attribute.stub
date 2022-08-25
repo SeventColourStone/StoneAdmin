@@ -1,0 +1,8 @@
+
+    /**
+     * 公共通用属性描述
+     * return array
+     */
+     protected $customAttributes = [
+{LIST}
+    ];

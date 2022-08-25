@@ -1,0 +1,14 @@
+
+    /**
+     * 数字运算操作
+     * @return NyuwaResponse
+     */
+    #[PutMapping("numberOperation"), Permission("{UPDATE_PERMISSION}"), OperationLog]
+    public function numberOperation(Request $request): NyuwaResponse
+    {
+        return $this->service->numberOperation(
+            $request->input('{PK}'),
+            (string) $request->input('{NUMBER_FIELD}'),
+            (int) $request->input('{NUMBER_VALUE}', 1),
+        ) ? $this->success() : $this->error();
+    }

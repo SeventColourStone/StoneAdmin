@@ -12,6 +12,7 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
+use nyuwa\exception\NyuwaException;
 use support\Request;
 use Webman\Route;
 use Webman\Push\Api;
@@ -19,7 +20,7 @@ use Webman\Push\Api;
 /**
  * 推送js客户端文件
  */
-Route::any('/plugin/webman/push/push.js', function (Request $request) {
+Route::get('/plugin/webman/push/push.js', function (Request $request) {
     return response()->file(base_path().'/vendor/webman/push/src/push.js');
 });
 
@@ -27,14 +28,17 @@ Route::any('/plugin/webman/push/push.js', function (Request $request) {
  * 私有频道鉴权，这里应该使用session辨别当前用户身份，然后确定该用户是否有权限监听channel_name
  */
 Route::any(config('plugin.webman.push.app.auth'), function (Request $request) {
-    $pusher = new Api(config('plugin.webman.push.app.api'), config('plugin.webman.push.app.app_key'), config('plugin.webman.push.app.app_secret'));
+    $pusher = new Api(str_replace('0.0.0.0', '127.0.0.1', config('plugin.webman.push.app.api')), config('plugin.webman.push.app.app_key'), config('plugin.webman.push.app.app_secret'));
     $channel_name = $request->post('channel_name');
-    $session = $request->session();
-    // 这里应该通过session和channel_name判断当前用户是否有权限监听channel_name
-    $has_authority = true;
-    if ($has_authority) {
+    $user = nyuwa_user();
+//    var_dump("鉴权信息：".json_encode($user,JSON_UNESCAPED_UNICODE));
+    var_dump("验签");
+    try {
+        $user->check();
+        var_dump("验签通过");
         return response($pusher->socketAuth($channel_name, $request->post('socket_id')));
-    } else {
+    }catch (NyuwaException $exception){
+        var_dump("未登录或鉴权失败用户:".$exception->getMessage());
         return response('Forbidden', 403);
     }
 });
@@ -44,7 +48,7 @@ Route::any(config('plugin.webman.push.app.auth'), function (Request $request) {
  * 频道上线：是指某个频道从没有连接在线到有连接在线的事件
  * 频道下线：是指某个频道的所有连接都断开触发的事件
  */
-Route::any(parse_url(config('plugin.webman.push.app.channel_hook'), PHP_URL_PATH), function (Request $request) {
+Route::post(parse_url(config('plugin.webman.push.app.channel_hook'), PHP_URL_PATH), function (Request $request) {
 
     // 没有x-pusher-signature头视为伪造请求
     if (!$webhook_signature = $request->header('x-pusher-signature')) {

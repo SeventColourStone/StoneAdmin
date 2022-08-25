@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace app\admin\mapper\system;
 
@@ -8,9 +9,13 @@ use app\admin\model\system\SystemMenu;
 use Illuminate\Database\Eloquent\Builder;
 use nyuwa\abstracts\AbstractMapper;
 
+/**
+ * 菜单表
+ * Class SystemMenuMapper
+ * @package app\admin\mapper\core
+ */
 class SystemMenuMapper extends AbstractMapper
 {
-
     /**
      * @var SystemMenu
      */
@@ -39,20 +44,48 @@ class SystemMenuMapper extends AbstractMapper
     }
 
     /**
+     * 获取超级管理员（创始人）的菜单
+     * @return array
+     */
+    public function getSuperAdminMenu(): array
+    {
+        return $this->model::query()
+            ->select(["id","parent_id","level","name as title","icon","redirect as href","type","open_type as openType"])
+            ->where('status', $this->model::ENABLE)
+            ->orderBy('sort', 'asc')
+            ->get()->toTree();
+    }
+    /**
+     * 通过菜单ID列表获取菜单数据
+     * @param array $ids
+     * @return array
+     */
+    public function getMenuByIds(array $ids): array
+    {
+        return $this->model::query()
+            ->select(["id","parent_id","level","name as title","icon","redirect as href","type","open_type as openType"])
+            ->whereIn('id', $ids)
+            ->where('status', $this->model::ENABLE)
+            ->orderBy('sort', 'asc')
+            ->get()->toTree();
+    }
+
+    /**
      * 获取超级管理员（创始人）的路由菜单
      * @return array
      */
     public function getSuperAdminRouters(): array
     {
         return $this->model::query()
-            ->select(...$this->menuField)
+            ->select($this->menuField)
             ->where('status', $this->model::ENABLE)
             ->orderBy('sort', 'desc')
             ->get()->sysMenuToRouterTree();
     }
 
     /**
-     * 通过菜单ID列表获取菜单数据
+     * 之后用作route前后端分离
+     * 通过菜单ID列表获取路由数据
      * @param array $ids
      * @return array
      */
@@ -143,7 +176,6 @@ class SystemMenuMapper extends AbstractMapper
     /**
      * 通过 route 查询菜单
      * @param string $route
-     * @return Builder|Model|object|null
      */
     public function findMenuByRoute(string $route)
     {
@@ -177,7 +209,6 @@ class SystemMenuMapper extends AbstractMapper
      */
     public function handleSearch(Builder $query, array $params): Builder
     {
-        var_dump($params);
         if (isset($params['is_hidden'])) {
             $query->where('is_hidden', $params['is_hidden']);
         }
@@ -191,7 +222,9 @@ class SystemMenuMapper extends AbstractMapper
         if (isset($params['type'])) {
             $query->whereIn('type', array_filter(explode(",",$params['type'])));
         }
+        if (isset($params['id'])) {
+            $query->whereIn('id', array_filter(explode(",",$params['id'])));
+        }
         return $query;
     }
-
 }

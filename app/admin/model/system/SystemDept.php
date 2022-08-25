@@ -1,14 +1,18 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
 
 namespace app\admin\model\system;
+
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use nyuwa\NyuwaModel;
-
 /**
+ * 部门信息表
+ * Class SystemDept
+ * @package app\admin\model\core
+ *
  * @property int $id 主键
  * @property int $parent_id 父ID
  * @property string $level 组级集合
@@ -27,7 +31,6 @@ use nyuwa\NyuwaModel;
  */
 class SystemDept extends NyuwaModel
 {
-
     use SoftDeletes;
     public $incrementing = false;
     /**
@@ -41,13 +44,16 @@ class SystemDept extends NyuwaModel
      *
      * @var array
      */
-    protected $fillable = ['id', 'parent_id', 'level', 'name', 'leader', 'phone', 'status', 'sort', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark'];
+    protected $fillable = ['parent_id','level','name','leader','phone','status','sort','created_by','updated_by','created_at','updated_at','deleted_at','remark',];
+
+
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = ['id' => 'string', 'parent_id' => 'string', 'sort' => 'integer', 'created_by' => 'string', 'updated_by' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected $casts = ['id' => 'string', 'created_by' => 'string', 'updated_by' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
     /**
      * 通过中间表获取角色
      */

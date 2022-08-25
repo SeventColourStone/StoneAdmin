@@ -1,8 +1,8 @@
 <?php
 
+declare (strict_types=1);
 
 namespace app\admin\model\system;
-
 use nyuwa\NyuwaModel;
 
 /**
@@ -38,5 +38,5 @@ class SystemLoginLog extends NyuwaModel
      *
      * @var array
      */
-    protected $casts = ['id' => 'string'];
+    protected $casts = ['id' => 'integer'];
 }

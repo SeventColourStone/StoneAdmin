@@ -28,13 +28,11 @@ class LoginUser
      * @param string|null $token
      * @param string $scene
      * @return bool
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function check(?string $token = null, string $scene = 'default'): bool
+    public function check(?string $token = null): bool
     {
         try {
-            if ($this->jwt->verifyTokenByScene($token, $scene)) {
+            if ($this->jwt->verifyTokenByScene($token, $this->jwt->getScene())) {
                 return true;
             }
         } catch (InvalidArgumentException $e) {
@@ -134,9 +132,8 @@ class LoginUser
      * @return string
      * @throws InvalidArgumentException
      */
-    public function createToken(array $user): array
+    public function createToken(array $user): string
     {
-        Log::info("创建的用户：".json_encode($user,JSON_UNESCAPED_UNICODE));
         return $this->jwt->createToken($user);
     }
 
@@ -145,7 +142,7 @@ class LoginUser
      * @return string
      * @throws InvalidArgumentException
      */
-    public function refresh(string $token): string
+    public function refresh(string $token = null): string
     {
         return $this->jwt->refreshToken($token);
     }

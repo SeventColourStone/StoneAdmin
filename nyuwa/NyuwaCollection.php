@@ -5,6 +5,9 @@ namespace nyuwa;
 
 
 use Illuminate\Database\Eloquent\Collection;
+use nyuwa\office\excel\PhpOffice;
+use nyuwa\office\excel\XlsWriter;
+use support\Log;
 
 class NyuwaCollection extends Collection
 {
@@ -75,6 +78,41 @@ class NyuwaCollection extends Collection
 
         unset($data);
         return $tree;
+    }
+
+    /**
+     * 导出数据
+     * @param string $dto
+     * @param string $filename
+     * @param array|\Closure|null $closure
+     */
+    public function export(string $dto, string $filename, array|\Closure $closure = null)
+    {
+        $excelDrive = config('Nyuwaadmin.excel_drive',"xlsWriter");
+        if ($excelDrive === 'auto') {
+            $excel = extension_loaded('xlswriter') ? new XlsWriter($dto) : new PhpOffice($dto);
+        } else {
+            $excel = $excelDrive === 'xlsWriter' ? new XlsWriter($dto) : new PhpOffice($dto);
+        }
+        return $excel->export($filename, is_null($closure) ? $this->toArray() : $closure);
+    }
+
+    /**
+     * 数据导入
+     * @param string $dto
+     * @param NyuwaModel $model
+     * @param \Closure|null $closure
+     * @return bool
+     */
+    public function import(string $dto, NyuwaModel $model, ?\Closure $closure = null): bool
+    {
+        $excelDrive = config('Nyuwaadmin.excel_drive',"xlsWriter");
+        if ($excelDrive === 'auto') {
+            $excel = extension_loaded('xlswriter') ? new XlsWriter($dto) : new PhpOffice($dto);
+        } else {
+            $excel = $excelDrive === 'xlsWriter' ? new XlsWriter($dto) : new PhpOffice($dto);
+        }
+        return $excel->import($model, $closure);
     }
 
 }

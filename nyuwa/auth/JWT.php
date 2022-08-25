@@ -55,7 +55,7 @@ class JWT extends AbstractJWT
      */
     private $jwtClaimScene = 'jwt_scene';
 
-    private $scene = 'default';
+    private $scene = "";
 
     /**
      * 为默认scene配置
@@ -82,7 +82,6 @@ class JWT extends AbstractJWT
     {
         $this->setScene($scene);
         $jwtSceneConfig = $this->getJwtSceneConfig($scene);
-        Log::info(json_encode($jwtSceneConfig,JSON_UNESCAPED_UNICODE));
         $useAlgsClass = $this->supportAlgs[$jwtSceneConfig['alg']];//这个地方貌似会出异常。
         $algInfo = ["alg"=>$jwtSceneConfig['alg'] ,"alg_class"=>$useAlgsClass];
         if (!$this->isAsymmetric($algInfo)) {
@@ -121,29 +120,15 @@ class JWT extends AbstractJWT
                 "passphrase"=>"",//你的私钥的密码。不需要密码可以不用设置
             ],
         ];
-//        $jwtConfig = Config::get(JWTConstantAlias::DEFAULT_NANE);
-//        $sceneConfig = Config::get(JWTConstantAlias::CONFIG_NAME);
-//        $scenes = $sceneConfig['scene'];
-//
-//        $cachePrefix = $sceneConfig['cache_prefix'];
-//        foreach ($scenes as $sceneKey => $scene) {
-//            //把配置写入
-//            $sceneConfig = array_merge($jwtConfig, $scene);
-//            $sceneConfigKey = $cachePrefix . '-' .$sceneKey;
-//            Cache::set($sceneConfigKey, $sceneConfig);
-//        }
-//
-//        $this->jwtConfig = $jwtConfig;
-//        $this->cache = make(CacheInterface::class);
-//        $this->pathMatch = make(PathMatch::class);
     }
 
 
-    public function createToken(array $claims,string $scene = "default"):array
+    public function createToken(array $claims):string
     {
         // 初始化lcobucci jwt config
-        $this->initConfiguration($scene);
-        $claims[$this->jwtClaimScene] = $scene; // 加入场景值
+        $this->initConfiguration($this->getScene());
+
+        $claims[$this->jwtClaimScene] = $this->getScene(); // 加入场景值
 
         $expConfig = [
             "login_type"=> "sso",
@@ -194,15 +179,12 @@ class JWT extends AbstractJWT
         $tokenPlain = $builder->getToken($this->lcobucciJwtConfiguration->signer(), $this->lcobucciJwtConfiguration->signingKey());
         $token = $tokenPlain->toString();
 
-        $tokenInfo = [
-            "expiresAt" => $expiresAt,
-            "issuedAt" => $now,
-            "identifiedBy" => $uniqid,
-            "issuedBy" => $issuedBy,
-            "ttl" => $jwtSceneConfig['ttl'],
-            "token" => $token
-        ];
-        return $tokenInfo;
+        return $token;
+//            [
+//            "expires_at" => $expiresAt->format("Y-m-d H:i:s"),
+//            "expires_in" => $jwtSceneConfig['ttl'],
+//            "access_token" => $token
+//        ];
     }
 
     public function verifyToken(string $token): bool
@@ -251,7 +233,7 @@ class JWT extends AbstractJWT
         return $this->getSceneByTokenPlain($token);
     }
 
-    public function refreshToken(string $token): array
+    public function refreshToken(string $token = null): string
     {
         if($token == null) {
             //从header获取
@@ -316,7 +298,7 @@ class JWT extends AbstractJWT
         return TimeUtil::now()->setTimestamp($expTime)->max($nowTime)->diffInSeconds();
     }
 
-    public function invalidToken(string $token): bool
+    public function invalidToken(string $token = null): bool
     {
         if($token == null) {
             $token = JWTUtil::getToken();

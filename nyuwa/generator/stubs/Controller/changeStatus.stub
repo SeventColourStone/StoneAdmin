@@ -1,0 +1,15 @@
+
+    /**
+     * 更改数据状态
+     * @return NyuwaResponse
+     */
+    #[PutMapping("changeStatus"), Permission("{UPDATE_PERMISSION}"), OperationLog]
+    public function changeStatus(Request $request): NyuwaResponse
+    {
+        $data = $this->validate->scene("status")->check($request->all());
+        return $this->service->changeStatus(
+            $data['{PK}'],
+            (string) $request->input('{STATUS_VALUE}'),
+            (string) $request->input('{STATUS_FIELD}')
+        ) ? $this->success() : $this->error();
+    }

@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace app\admin\service\system;
 
@@ -17,11 +18,9 @@ class SystemDictDataService extends AbstractService
      */
     public $mapper;
 
-    /**
-     * @Value("cache.default.prefix")
-     * @var string
-     */
-    protected $prefix;
+    #[Value("cache.default.prefix")]
+    protected $prefix = "";
+
 
     /**
      * 查询多个字典
@@ -47,16 +46,16 @@ class SystemDictDataService extends AbstractService
     /**
      * 查询一个字典
      * @param array|null $params
+     * @param bool $isScope
      * @return array
      */
-    public function getList(?array $params = null): array
+    public function getList(?array $params = null, bool $isScope = false): array
     {
         if (! isset($params['code'])) {
             return [];
         }
 
-        $key = $this->prefix . 'Dict:' .
-            $params['code'];
+        $key = $this->prefix . 'Dict:' . $params['code'];
 
         if ($data = Redis::get($key)) {
             return unserialize($data);
@@ -68,7 +67,7 @@ class SystemDictDataService extends AbstractService
             'orderBy' => 'sort',
             'orderType' => 'desc'
         ];
-        $data = $this->mapper->getList(array_merge($args, $params), false);
+        $data = $this->mapper->getList(array_merge($args, $params), $isScope);
 
         Redis::set($key, serialize($data));
 

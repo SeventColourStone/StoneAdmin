@@ -1,0 +1,40 @@
+<?php
+declare(strict_types=1);
+/**
+
+ */
+
+namespace {NAMESPACE};
+
+{USE}
+use DI\Annotation\Inject;
+use nyuwa\NyuwaController;
+use nyuwa\NyuwaResponse;
+use support\Request;
+
+/**
+ * {COMMENT}
+ * Class {CLASS_NAME}
+ */
+#[Controller(prefix: "{CONTROLLER_ROUTE}"), Auth]
+class {CLASS_NAME} extends NyuwaController
+{
+
+    /**
+     * {SERVICE} 服务
+     * @Inject
+     * @var {SERVICE}
+     */
+    protected {SERVICE} $service;
+
+
+    /**
+     * {VALIDATE} 验证器
+     * @Inject
+     * @var {VALIDATE}
+     */
+    protected {VALIDATE} $validate;
+
+
+    {FUNCTIONS}
+}

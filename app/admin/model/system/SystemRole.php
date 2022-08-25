@@ -1,7 +1,7 @@
 <?php
 
+declare(strict_types=1);
 
-declare (strict_types=1);
 namespace app\admin\model\system;
 
 
@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use nyuwa\NyuwaModel;
 /**
+ * 角色表
+ * Class SystemRole
+ * @package app\admin\model\core
+ *
  * @property int $id 主键，角色ID
  * @property string $name 角色名称
  * @property string $code 角色代码
@@ -30,15 +34,15 @@ class SystemRole extends NyuwaModel
     use SoftDeletes;
     public $incrementing = false;
     // 所有
-    public const ALL_SCOPE = 0;
+    public const ALL_SCOPE = '0';
     // 自定义
-    public const CUSTOM_SCOPE = 1;
+    public const CUSTOM_SCOPE = '1';
     // 本部门
-    public const SELF_DEPT_SCOPE = 2;
+    public const SELF_DEPT_SCOPE = '2';
     // 本部门及子部门
-    public const DEPT_BELOW_SCOPE = 3;
+    public const DEPT_BELOW_SCOPE = '3';
     // 本人
-    public const SELF_SCOPE = 4;
+    public const SELF_SCOPE = '4';
     /**
      * The table associated with the model.
      *
@@ -50,13 +54,16 @@ class SystemRole extends NyuwaModel
      *
      * @var array
      */
-    protected $fillable = ['id', 'name', 'code', 'data_scope', 'status', 'sort', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark'];
+    protected $fillable = ['name','code','data_scope','status','sort','created_by','updated_by','created_at','updated_at','deleted_at','remark',];
+
+
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = ['id' => 'string', 'sort' => 'integer', 'created_by' => 'string', 'updated_by' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected $casts = ['id' => 'string', 'created_by' => 'string', 'updated_by' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
 
 
     /**

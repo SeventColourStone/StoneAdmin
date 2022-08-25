@@ -1,0 +1,9 @@
+
+    /**
+     * 定义 {RELATION_NAME} 关联
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function {RELATION_NAME}() : \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne({MODEL_NAME}::class, '{FOREIGN_KEY}', '{LOCAL_KEY}');
+    }

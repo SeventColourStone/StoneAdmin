@@ -4,9 +4,9 @@
 namespace nyuwa;
 
 
-use Hyperf\Di\Annotation\Inject;
-use Hyperf\Utils\Filesystem\Filesystem;
 use Psr\Container\ContainerInterface;
+use support\Container;
+use Symfony\Component\Filesystem\Filesystem;
 
 class Nyuwa
 {
@@ -26,18 +26,10 @@ class Nyuwa
     private $moduleInfo = [];
 
     /**
-     * @Inject
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function __construct()
     {
-        $this->setAppPath(self::getRootPath() . 'app');
+        $this->setAppPath(app_path());
         $this->scanModule();
     }
 
@@ -46,7 +38,7 @@ class Nyuwa
      */
     public static function getRootPath(): string
     {
-        $directory = __DIR__;
+        $directory = app_path();
         while(strpos($directory, 'runtime') > 0) {
             $directory = dirname($directory);
         }
@@ -56,35 +48,23 @@ class Nyuwa
     /**
      * @param string $id
      * @return mixed
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function app(string $id)
     {
-        return $this->container->get($id);
+        return Container::get($id);
     }
 
-    /**
-     * @return ContainerInterface
-     */
-    public function getContainer(): ContainerInterface
-    {
-        return $this->container;
-    }
 
     /**
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function scanModule(): void
     {
         $modules = glob(self::getAppPath() . '*');
-        $fs = $this->app(Filesystem::class);
         $infos = null;
         foreach ($modules as &$mod) if (is_dir($mod)) {
             $modInfo = $mod . DIRECTORY_SEPARATOR . 'config.json';
             if (file_exists($modInfo)) {
-                $infos[basename($mod)] = json_decode($fs->sharedGet($modInfo), true);
+                $infos[basename($mod)] = json_decode(file_get_contents($modInfo), true);
             }
         }
         $this->setModuleInfo($infos);
@@ -139,8 +119,6 @@ class Nyuwa
      * @param $value
      * @param false $save
      * @return bool
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      * @noinspection PhpUnused
      */
     public function setModuleConfigValue(String $key, $value, bool $save = false): bool
@@ -160,8 +138,6 @@ class Nyuwa
 
     /**
      * @param string $mod
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     protected function saveModuleConfig(string $mod): void
     {

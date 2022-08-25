@@ -1,0 +1,20 @@
+
+    /**
+     * 数据导入
+     * @return NyuwaResponse
+     */
+    #[PostMapping("import"), Permission("{IMPORT_PERMISSION}")]
+    public function import(): NyuwaResponse
+    {
+        return $this->service->import({DTO_CLASS}) ? $this->success() : $this->error();
+    }
+
+    /**
+     * 下载导入模板
+     * @return NyuwaResponse
+     */
+    #[PostMapping("downloadTemplate")]
+    public function downloadTemplate(): NyuwaResponse
+    {
+        return (new \Mine\MineCollection)->export({DTO_CLASS}, '模板下载', []);
+    }

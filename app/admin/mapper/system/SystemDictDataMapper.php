@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace app\admin\mapper\system;
 
@@ -8,6 +9,11 @@ use app\admin\model\system\SystemDictData;
 use Illuminate\Database\Eloquent\Builder;
 use nyuwa\abstracts\AbstractMapper;
 
+/**
+ * 字典数据表
+ * Class SystemDictDataMapper
+ * @package app\admin\mapper\core
+ */
 class SystemDictDataMapper extends AbstractMapper
 {
     /**
@@ -18,29 +24,6 @@ class SystemDictDataMapper extends AbstractMapper
     public function assignModel()
     {
         $this->model = SystemDictData::class;
-    }
-
-    /**
-     * 根据字典类型id获取字典表数据
-     * @param $typeId
-     */
-    public function getDictDataListByTypeId($typeId){
-        return $this->model::query()
-            ->where("type_id",$typeId)
-            ->where("status",0)
-            ->orderBy("sort")
-            ->get(['label as name','value','code'])->toArray();
-    }
-    /**
-     * 根据字典类型id获取字典表label
-     * @param $typeId
-     */
-    public function getLabelByTypeIdAndVal($typeId,$val){
-        return $this->model::query()
-            ->where("type_id",$typeId)
-            ->where("value",$val)
-            ->where("status",0)
-            ->value('label');
     }
 
     /**

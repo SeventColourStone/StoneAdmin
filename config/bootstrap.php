@@ -12,10 +12,7 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-
 return [
-//    \nyuwa\aop\bootstrap\AopRegister::class,
     support\bootstrap\Session::class,
     support\bootstrap\LaravelDb::class,
-    nyuwa\bootstrap\LaravelLog::class
 ];

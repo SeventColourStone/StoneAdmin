@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace app\admin\model\system;
 
@@ -8,6 +9,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use nyuwa\NyuwaModel;
 /**
+ * 字典类型表
+ * Class SystemDictType
+ * @package app\admin\model\core
+ *
  * @property int $id 主键
  * @property string $name 字典名称
  * @property string $code 字典标示
@@ -35,7 +40,9 @@ class SystemDictType extends NyuwaModel
      *
      * @var array
      */
-    protected $fillable = ['id', 'name', 'code', 'status', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark'];
+    protected $fillable = ['name','code','status','created_by','updated_by','created_at','updated_at','deleted_at','remark',];
+
+
     /**
      * The attributes that should be cast to native types.
      *

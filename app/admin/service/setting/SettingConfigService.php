@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
 
 namespace app\admin\service\setting;
 
 
-use app\admin\mapper\system\SettingConfigMapper;
+use app\admin\mapper\setting\SettingConfigMapper;
 use DI\Annotation\Inject;
 use nyuwa\abstracts\AbstractService;
 use support\Redis;
@@ -17,11 +18,10 @@ class SettingConfigService extends AbstractService
      */
     public $mapper;
 
-
     /**
      * @var string
      */
-    protected $prefix = "nyuwa";
+    protected $prefix = "STONE_ADMIN_";
 
     /**
      * @var string
@@ -33,18 +33,12 @@ class SettingConfigService extends AbstractService
      */
     protected $cacheName;
 
-    /**
-     * SettingConfigService constructor.
-     * @param SettingConfigMapper $mapper
-     * @param ContainerInterface $container
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
     public function __construct()
     {
         $this->setCacheGroupName($this->prefix . 'configGroup:');
         $this->setCacheName($this->prefix . 'config:');
     }
+
 
     /**
      * 获取系统组配置
@@ -180,4 +174,5 @@ class SettingConfigService extends AbstractService
     {
         $this->cacheName = $cacheName;
     }
+
 }

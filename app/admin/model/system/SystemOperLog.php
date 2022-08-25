@@ -1,8 +1,8 @@
 <?php
 
 declare (strict_types=1);
-namespace app\admin\model\system;
 
+namespace app\admin\model\system;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use nyuwa\NyuwaModel;
 
@@ -45,5 +45,5 @@ class SystemOperLog extends NyuwaModel
      *
      * @var array
      */
-    protected $casts = ['id' => 'string', 'created_by' => 'string', 'updated_by' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected $casts = ['id' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }

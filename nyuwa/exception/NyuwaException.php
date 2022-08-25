@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace nyuwa\exception;
 
 
-class NyuwaException extends \RuntimeException
+use support\exception\BusinessException;
+
+class NyuwaException extends BusinessException
 {
 
 }

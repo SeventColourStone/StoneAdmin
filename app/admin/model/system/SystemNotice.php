@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
 
-declare (strict_types=1);
 namespace app\admin\model\system;
 
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use nyuwa\NyuwaModel;
-
 /**
+ * 系统公告表
+ * Class SystemNotice
+ * @package app\admin\model\core
+ *
  * @property int $id 主键
  * @property int $message_id 消息ID
  * @property string $title 标题
@@ -37,12 +41,14 @@ class SystemNotice extends NyuwaModel
      *
      * @var array
      */
-    protected $fillable = ['id', 'message_id', 'title', 'type', 'content', 'click_num', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark'];
+    protected $fillable = ['message_id','title','type','content','click_num','created_by','updated_by','created_at','updated_at','deleted_at','remark',];
+
+
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = ['id' => 'string', 'message_id' => 'string', 'click_num' => 'integer', 'created_by' => 'string', 'updated_by' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected $casts = ['id' => 'string', 'created_by' => 'string', 'updated_by' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
 }

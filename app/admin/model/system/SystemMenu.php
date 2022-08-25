@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
 
-declare (strict_types=1);
 namespace app\admin\model\system;
 
 
+use app\admin\model\system\SystemRole;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use nyuwa\NyuwaModel;
-
 /**
+ * 菜单表
+ * Class SystemMenu
+ * @package app\admin\model\core
+ *
  * @property int $id 主键
  * @property int $parent_id 父ID
  * @property string $level 组级集合
@@ -34,9 +38,8 @@ use nyuwa\NyuwaModel;
  */
 class SystemMenu extends NyuwaModel
 {
-
     use SoftDeletes;
-    public $incrementing = true;
+    public $incrementing = false;
     /**
      * 类型
      */
@@ -45,6 +48,7 @@ class SystemMenu extends NyuwaModel
     public const MENUS_LIST = 'M';
     public const DIRECTORY_LIST = 'D';
     public const BUTTON = 'B';
+
     /**
      * The table associated with the model.
      *
@@ -56,15 +60,15 @@ class SystemMenu extends NyuwaModel
      *
      * @var array
      */
-    protected $fillable = ['id', 'parent_id', 'level', 'name', 'code', 'icon', 'route', 'component', 'redirect', 'is_hidden', 'type','open_type', 'status', 'sort', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark'];
+    protected $fillable = ["id",'parent_id','level','name','code','icon','route','component','redirect','is_hidden','type','open_type','status','sort','created_by','updated_by','created_at','updated_at','deleted_at','remark',];
+
+
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = ['id' => 'string', 'parent_id' => 'string', 'sort' => 'integer', 'created_by' => 'string', 'updated_by' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
-
-
+    protected $casts = ['id' => 'string', 'created_by' => 'string', 'updated_by' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     /**
      * 通过中间表获取角色
