@@ -10,10 +10,10 @@ return [
         "default_environment"     => "dev",
         "dev" => [
             "adapter" => "mysql",
-            "host"    => "129.28.186.67",
+            "host"    => "127.0.0.1",
             "name"    => 'stone',
             "user"    => 'stone',
-            "pass"    => "hSDwYZ2fnSRGjJhR",
+            "pass"    => "stone",
             "port"    => 3306,
             "charset" => "utf8mb4"
         ],
