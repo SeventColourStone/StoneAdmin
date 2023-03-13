@@ -1,0 +1,52 @@
+<?php
+declare(strict_types=1);
+/**
+
+ */
+
+namespace {NAMESPACE};
+
+{USE}
+use DI\Attribute\Inject;
+use plugin\stone\nyuwa\NyuwaController;
+use plugin\stone\nyuwa\NyuwaResponse;
+use support\Request;
+
+/**
+ * {COMMENT}
+ * Class {CLASS_NAME}
+ */
+class {CLASS_NAME} extends NyuwaController
+{
+
+    /**
+     * 不需要登录的方法
+     * @var string[]
+     */
+    protected array $noNeedLogin = [];
+
+    /**
+     * 不需要鉴权的方法
+     * @var string[]
+     */
+    protected array $noNeedAuth = [];
+
+
+    /**
+     * {SERVICE} 服务
+     * @var {SERVICE}
+     */
+    #[Inject]
+    protected {SERVICE} $service;
+
+
+    /**
+     * {VALIDATE} 验证器
+     * @var {VALIDATE}
+     */
+    #[Inject]
+    protected {VALIDATE} $validate;
+
+
+    {FUNCTIONS}
+}

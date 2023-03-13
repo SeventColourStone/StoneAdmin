@@ -27,7 +27,7 @@ module.exports = {
         target: base_url,
         ws: true,
         pathRewrite: {
-          ['^' + proxy_api]: '/'
+          ['^' + proxy_api]: proxy_api
         }
       }
     }

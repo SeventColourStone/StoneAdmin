@@ -1,0 +1,9 @@
+
+    /**
+     * 回收站列表
+     * @return NyuwaResponse
+     */
+    public function recycle(Request $request): NyuwaResponse
+    {
+        return $this->success($this->service->getPageListByRecycle($request->all()));
+    }

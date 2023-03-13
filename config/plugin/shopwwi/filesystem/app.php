@@ -14,17 +14,28 @@
  */
 
 return [
+    'enable' => true,
     'default' => 'local',
+    'max_size' => 1024 * 1024 * 10, //单个文件大小10M
+    'ext_yes' => [], //允许上传文件类型 为空则为允许所有
+    'ext_no' => [], // 不允许上传文件类型 为空则不限制
     'storage' => [
+        'public' => [
+            'driver' => \Shopwwi\WebmanFilesystem\Adapter\LocalAdapterFactory::class,
+            'root' => public_path().'\\'.env('UPLOAD_PATH', 'uploadfile'),
+            'url' => '//127.0.0.1:8787' // 静态文件访问域名
+        ],
         'local' => [
             'driver' => \Shopwwi\WebmanFilesystem\Adapter\LocalAdapterFactory::class,
-            'root' => runtime_path(),
+            'root' => public_path().'\\'.env('UPLOAD_PATH', 'uploadfile'),
+            'url' => '//127.0.0.1:8787' // 静态文件访问域名
         ],
         'ftp' => [
             'driver' => \Shopwwi\WebmanFilesystem\Adapter\FtpAdapterFactory::class,
             'host' => 'ftp.example.com',
             'username' => 'username',
             'password' => 'password',
+            'url' => '' // 静态文件访问域名
             // 'port' => 21,
             // 'root' => '/path/to/root',
             // 'passive' => true,
@@ -48,6 +59,7 @@ return [
             'use_path_style_endpoint' => false,
             'endpoint' => 'S3_ENDPOINT',
             'bucket_name' => 'S3_BUCKET',
+            'url' => '' // 静态文件访问域名
         ],
         'minio' => [
             'driver' => \Shopwwi\WebmanFilesystem\Adapter\S3AdapterFactory::class,
@@ -61,6 +73,7 @@ return [
             'use_path_style_endpoint' => true,
             'endpoint' => 'S3_ENDPOINT',
             'bucket_name' => 'S3_BUCKET',
+            'url' => '' // 静态文件访问域名
         ],
         'oss' => [
             'driver' => \Shopwwi\WebmanFilesystem\Adapter\AliyunOssAdapterFactory::class,
@@ -68,6 +81,7 @@ return [
             'accessSecret' => 'OSS_ACCESS_SECRET',
             'bucket' => 'OSS_BUCKET',
             'endpoint' => 'OSS_ENDPOINT',
+            'url' => '' // 静态文件访问域名
             // 'timeout' => 3600,
             // 'connectTimeout' => 10,
             // 'isCName' => false,
@@ -80,6 +94,7 @@ return [
             'secretKey' => 'QINIU_SECRET_KEY',
             'bucket' => 'QINIU_BUCKET',
             'domain' => 'QINBIU_DOMAIN',
+            'url' => '' // 静态文件访问域名
         ],
         'cos' => [
             'driver' => \Shopwwi\WebmanFilesystem\Adapter\CosAdapterFactory::class,
@@ -91,6 +106,7 @@ return [
             // 'signed_url' => false,
             'bucket' => 'COS_BUCKET',
             'read_from_cdn' => false,
+            'url' => '' // 静态文件访问域名
             // 'timeout' => 60,
             // 'connect_timeout' => 60,
             // 'cdn' => '',

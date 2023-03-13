@@ -12,16 +12,4 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-use App\middleware\SystemAuthorizationMiddleware;
-
-return [
-    // 全局中间件
-    '' => [
-        // ... 这里省略其它中间件
-        //操作日记中间件
-//        app\middleware\OperLogMiddleware::class,
-    ],
-    'admin' => [
-        SystemAuthorizationMiddleware::class
-    ]
-];
+return [];

@@ -12,10 +12,6 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-use nyuwa\exception\TestExceptionHandler;
-
 return [
-//    '' => support\exception\Handler::class,
-//    '' => TestExceptionHandler::class,
-    '' => \nyuwa\exception\StoneGlobalExceptionHandler::class,
+    '' => support\exception\Handler::class,
 ];

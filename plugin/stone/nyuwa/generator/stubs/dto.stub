@@ -1,0 +1,16 @@
+<?php
+namespace {NAMESPACE};
+
+use plugin\stone\nyuwa\annotation\ExcelData;
+use plugin\stone\nyuwa\annotation\ExcelProperty;
+use plugin\stone\nyuwa\interfaces\NyuwaModelExcel;
+
+/**
+ * {COMMENT}
+ * @ExcelData
+ */
+#[ExcelData]
+class {CLASS_NAME} implements NyuwaModelExcel
+{
+{LIST}
+}

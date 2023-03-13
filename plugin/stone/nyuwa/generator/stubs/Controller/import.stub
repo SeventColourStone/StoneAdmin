@@ -1,0 +1,18 @@
+
+    /**
+     * 数据导入
+     * @return NyuwaResponse
+     */
+    public function import(): NyuwaResponse
+    {
+        return $this->service->import({DTO_CLASS}) ? $this->success() : $this->error();
+    }
+
+    /**
+     * 下载导入模板
+     * @return NyuwaResponse
+     */
+    public function downloadTemplate(): NyuwaResponse
+    {
+        return (new \plugin\stone\nyuwa\NyuwaCollection)->export({DTO_CLASS}, '模板下载', []);
+    }

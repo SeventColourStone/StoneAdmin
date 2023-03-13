@@ -1,0 +1,9 @@
+{
+  "name": "stone",
+  "label": "admin模块",
+  "description": "StoneAdmin核心、内置模块，主要功能面向开发者",
+  "installed": true,
+  "enabled": true,
+  "version": "1.0.0",
+  "order": 99
+}

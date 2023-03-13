@@ -1,0 +1,28 @@
+<?php
+declare(strict_types=1);
+/**
+
+ */
+
+namespace {NAMESPACE};
+
+{USE}
+use DI\Attribute\Inject;
+use plugin\stone\nyuwa\abstracts\AbstractService;
+use plugin\stone\nyuwa\exception\NormalStatusException;
+
+/**
+ * {COMMENT}
+ */
+class {CLASS_NAME} extends AbstractService
+{
+    /**
+     * @var {MAPPER}
+     */
+    public $mapper;
+
+    public function __construct({MAPPER} $mapper)
+    {
+        $this->mapper = $mapper;
+    }
+}

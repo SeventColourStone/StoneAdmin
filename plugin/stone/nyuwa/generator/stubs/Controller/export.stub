@@ -1,0 +1,9 @@
+
+    /**
+     * 数据导出
+     * @return NyuwaResponse
+     */
+    public function export(Request $request): NyuwaResponse
+    {
+        return $this->service->export($request->all(), {DTO_CLASS}, '导出数据列表');
+    }

@@ -1,0 +1,10 @@
+
+    /**
+     * 单个或批量真实删除数据 （清空回收站）
+     * @return NyuwaResponse
+     */
+    public function realDelete(Request $request): NyuwaResponse
+    {
+        $data = $this->validate->scene("key")->check($request->all());
+        return $this->service->realDelete($data["id"]) ? $this->success() : $this->error();
+    }

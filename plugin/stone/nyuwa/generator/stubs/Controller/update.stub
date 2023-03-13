@@ -1,0 +1,11 @@
+
+    /**
+     * 更新
+     * @return NyuwaResponse
+     */
+    public function update(Request $request): NyuwaResponse
+    {
+        $this->validate->scene("update")->check($request->all());
+        $data = $request->all();
+        return $this->service->update($data["id"], $data) ? $this->success() : $this->error();
+    }

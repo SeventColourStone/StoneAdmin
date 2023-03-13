@@ -1,0 +1,10 @@
+
+    /**
+     * 新增
+     * @return NyuwaResponse
+     */
+    public function save(Request $request): NyuwaResponse
+    {
+        $data = $this->validate->scene("create")->check($request->all());
+        return $this->success(['id' => $this->service->save($request->all())]);
+    }
